@@ -9,11 +9,15 @@
 #include <bitset>
 #include "calsht_dw.hpp"
 
-int main()
+int main(int argc, char* argv[])
 {
+  if(argc != 2){
+    return 1;
+  }
+  
   const int K = 34;
   const int M = 14;
-  const int N = 100000;
+  const int N = std::atoi(argv[1]);
   
   std::array<int,K> hd;
   std::array<int,K> wl;
@@ -27,8 +31,7 @@ int main()
   
   if(!calsht) return 1;
   
-  std::mt19937 rand1(0);
-  std::mt19937 rand2(0);
+  std::mt19937 rand(std::random_device{}());
   std::ofstream fout("result.txt");
   
   for(int i=0; i<4; ++i){
@@ -44,7 +47,7 @@ int main()
     wl.fill(4);
     
     for(int j=1; j<=M+17; ++j){
-      int n = rand1()%(4*K-j+1);
+      int n = rand()%(4*K-j+1);
       ++hd[wall[n]];
       --wl[wall[n]];
       std::swap(wall[n],wall[4*K-j]);
@@ -69,7 +72,7 @@ int main()
               ++hd[k];
             }
           }
-          n = rand2()%K;
+          n = rand()%K;
           int tile = n;
           int max = cnt[n];
           
@@ -84,7 +87,7 @@ int main()
         else{
           for(int k=j+1; k<=M+17; ++k){
             ++sht[k-M][num];
-            n = rand1()%(4*K-k+1);
+            n = rand()%(4*K-k+1);
             std::swap(wall[n],wall[4*K-k]);
           }
           break;

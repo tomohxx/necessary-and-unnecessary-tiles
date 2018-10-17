@@ -8,7 +8,7 @@
 ## サンプルプログラムの使用方法
 1. インデックスファイルを解凍
 ```
-$ gunzip index_dw_h.txt index_dw_s.txt
+$ gunzip index_dw_h.txt.gz index_dw_s.txt.gz
 ```
 
 2. ビルド

@@ -1,0 +1,2 @@
+# YuukouhaiFuyouhaiCalculator
+麻雀において有効牌と不要牌およびシャンテン数を同時に計算する

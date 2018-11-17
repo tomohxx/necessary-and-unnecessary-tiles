@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
       std::swap(wall[n],wall[4*K-j]);
       
       if(j>=M){
-        int num = calsht(hd.data(),M,mode,disc,wait);
+        int num = calsht(hd.data(),4,mode,disc,wait);
         ++sht[j-M][num];
         
         if(num>0){
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
           for(int k=0; k<K; ++k){
             if(bs1[k]){
               --hd[k];
-              calsht(hd.data(),M-1,mode,disc,wait);
+              calsht(hd.data(),4,mode,disc,wait);
               std::bitset<K> bs2(wait);
               
               for(int l=0; l<K; ++l){

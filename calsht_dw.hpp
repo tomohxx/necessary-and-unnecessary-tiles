@@ -25,14 +25,12 @@ private:
   
 public:
   CalshtDW();
-  int calc_lh(const int* t, int m, int f, Ull& disc, Ull& wait) const;
-  int calc_lh(const int* t, int m, Ull& disc, Ull& wait) const {return calc_lh(t,m,m/3,disc,wait);}
+  int calc_lh(const int* t, int m, Ull& disc, Ull& wait) const;
   int calc_sp(const int* t, Ull& disc, Ull& wait) const;
   int calc_sp(const int* t, int m, Ull& disc, Ull& wait) const {return calc_sp(t,disc,wait);}
   int calc_to(const int* t, Ull& disc, Ull& wait) const;
   int calc_to(const int* t, int m, Ull& disc, Ull& wait) const {return calc_to(t,disc,wait);}
-  int operator()(const int* t, int m, int f, int& mode, Ull& disc, Ull& wait) const;
-  int operator()(const int* t, int m, int& mode, Ull& disc, Ull& wait) const {return operator()(t,m,m/3,mode,disc,wait);}
+  int operator()(const int* t, int m, int& mode, Ull& disc, Ull& wait) const;
   bool operator!() const;
 };
 

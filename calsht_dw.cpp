@@ -77,17 +77,17 @@ bool CalshtDW::operator!() const
   return mp1.empty() || mp2.empty() || itr1==mp1.begin() || itr2==mp2.begin();
 }
   
-int CalshtDW::calc_lh(const int* t, const int m, const int f, Ull& disc, Ull& wait) const
+int CalshtDW::calc_lh(const int* t, const int m, Ull& disc, Ull& wait) const
 {
   Vec ret = mp2[std::accumulate(t+28,t+34,t[27],[](int x, int y){return 5*x+y;})];
 
   add(ret, mp1[std::accumulate(t+19,t+27,t[18],[](int x, int y){return 5*x+y;})]);
   add(ret, mp1[std::accumulate(t+10,t+18,t[9],[](int x, int y){return 5*x+y;})]);
-  add(ret, mp1[std::accumulate(t+1,t+9,t[0],[](int x, int y){return 5*x+y;})], 5+f);
+  add(ret, mp1[std::accumulate(t+1,t+9,t[0],[](int x, int y){return 5*x+y;})], 5+m);
   
-  disc = ret[15+f];
-  wait = ret[25+f];
-  return (static_cast<int>(ret[5+f])+f*3+2-m)/2;
+  disc = ret[15+m];
+  wait = ret[25+m];
+  return static_cast<int>(ret[5+m]);
 }
 
 int CalshtDW::calc_sp(const int* t, Ull& disc, Ull& wait) const
@@ -147,12 +147,12 @@ int CalshtDW::calc_to(const int* t, Ull& disc, Ull& wait) const
   return 14-kind-(pair>0 ? 1:0);
 }
   
-int CalshtDW::operator()(const int* t, const int m, const int f, int& mode, Ull& disc, Ull& wait) const
+int CalshtDW::operator()(const int* t, const int m, int& mode, Ull& disc, Ull& wait) const
 {
-  if(f==4){
+  if(m==4){
     Ull disc_ = 0ULL;
     Ull wait_ = 0ULL;
-    int sht = calc_lh(t,m,f,disc,wait);
+    int sht = calc_lh(t,m,disc,wait);
     int sht_ = calc_sp(t,disc_,wait_);
     mode = 1;
     
@@ -177,6 +177,6 @@ int CalshtDW::operator()(const int* t, const int m, const int f, int& mode, Ull&
   }
   else{
     mode = 1;
-    return calc_lh(t,m,f,disc,wait);
+    return calc_lh(t,m,disc,wait);
   }
 }

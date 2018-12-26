@@ -58,13 +58,14 @@ int main(int argc, char* argv[])
         
         if(num>0){
           std::bitset<K> bs1(disc);
-          cnt.fill(0);
+          cnt.fill(-1);
           
           for(int k=0; k<K; ++k){
             if(bs1[k]){
               --hd[k];
               calsht(hd.data(),4,mode,disc,wait);
               std::bitset<K> bs2(wait);
+              cnt[k] = 0;
               
               for(int l=0; l<K; ++l){
                 cnt[k] += bs2[l] ? wl[l]:0;

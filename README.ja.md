@@ -1,30 +1,28 @@
 # YuukouhaiFuyouhaiCalculator
-A tool for calculating necesaary tiles and unnecessary tiles for winning hands in Japanese mahjong.
+麻雀におけるシャンテン数および有効牌・不要牌を計算する。
 
-[Read this in Japanese (日本語).](README.ja.md)
+[Read this in English.](README.md)
 
-## What are necessary tiles and unecessary tiles in mahjong ?
-- Necessary tiles:
-  - the tiles needed to win with **least number of exchanges**.
-  - decrease the shanten number when one of them is drawn.
-  - called "yuukouhai" or "ukeire" in Japanese.
-- Unnecessary tiles:
-  - the tiles unneeded to win with **least number of exchanges**.
-  - keep the shanten number unchanged when one of them is discarded.
-  - called "yojouhai" in Japanese.
+## 有効牌・不要牌
+- 有効牌:
+  - 最小の牌の交換回数であがるために必要な牌
+  - それをツモるとシャンテン数が低下する牌
+- 不要牌(余剰牌):
+  - 最小の牌の交換回数であがるために不要な牌
+  - それを捨ててもシャンテン数が変わらない牌
 
-## Usage
-1. Prepare an int-type array of length 34 representing a hand.
-- The n th element stores the number of n th tiles.
+## 使用方法
+1. 手牌を表す長さ34のint型配列を用意します。
+- n番目の要素がn番目の牌の枚数を格納します。
 
 ||1|2|3|4|5|6|7|8|9|
 |:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|
-|*Manzu*|0|1|2|3|4|5|6|7|8|
-|*Pinzu*|9|10|11|12|13|14|15|16|17|
-|*Souzu*|18|19|20|21|22|23|24|25|26|
-|*Jihai*|27 (*East*)|28 (*South*)|29 (*West*)|30 (*North*)|31 (*White*)|32 (*Green*)|33 (*Red*)|||
+|マンズ|0|1|2|3|4|5|6|7|8|
+|ピンズ|9|10|11|12|13|14|15|16|17|
+|ソーズ|18|19|20|21|22|23|24|25|26|
+|字牌|27 (東)|28 (南)|29 (西)|30 (北)|31 (白)|32 (発)|33 (中)|||
 
-- For example, if you have *manzu* tiles (1, 2, 3), *pinzu* tiles (2, 4, 5, 7, 7, 9), and *jihai* tiles (*East*, *West*, *White*, *White*, *White*), define the following array.
+- 例えば123m245779p13555zのような手牌の場合, 以下の配列を定義します。
 
 ```cpp
 int hand[34] = {
@@ -35,34 +33,33 @@ int hand[34] = {
 };
 ```
 
-2. Calculate the necessary tiles and the unnecessary tiles.
-- (a) For winnig hands composed of *n* tile groups and a pair:
+2. シャンテン数と有効牌・不要牌を計算します。
+- (a) *n*面子一雀頭形:
 ```cpp
 int Calsht::calc_lh(int* hand, int n, unsigned long long& disc, unsigned long long& wait)
 ```
 
-> **NOTE:** Normally, substitute the value obtained by dividing the number of tiles by 3 into _n_.
+> **NOTE:** 通常, *n*には手牌の枚数を3で割った値を代入する。
 
-- (b) For winning hands of Seven Pairs:
+- (b) 七対子:
 ```cpp
 int Calsht::calc_sp(int* hand, unsigned long long& disc, unsigned long long& wait)
 ```
-- (c) For winnig hands of Thirteen Orphans:
+- (c) 国士無双:
 ```cpp
 int Calsht::calc_to(int* hand, unsigned long long& disc, unsigned long long& wait)
 ```
-- (d) For winning hands of which the shanten number is minimum in above hands:
+- (d) 一般形:
 ```cpp
 int Calsht::operator()(int* hand, int n, int& mode, unsigned long long& disc, unsigned long long& wait)
 ```
+> **NOTE:** *mode*はどのあがりパターンがシャンテン数の最小値を与えるかを表します。n面子一雀頭形の場合は1, 七対子の場合は2, 国士無双の場合は4です。複数のあがりパターンでシャンテン数が最小となる場合は, それらのビット論理和が*mode*となります。よって*mode*は1から7までの値をとりえます。
 
-> **NOTE:** The argument *mode* above represents which winning pattern of the hand gives the minimum shanten number. When the pattern is (a), *mode* is 1, when (b): 2, (c):4. If there are multiple patters, *mode* is bitwise OR of them. Therefore, *mode* is one of the values 1 to 7.
+> **NOTE:** 各メソッドはシャンテン数+1の値を返します。
 
-> **NOTE:** Each method returns a value of Shanten number + 1.
+> **NOTE:** 参照渡しの引数*disc*と*wait*はそれぞれ不要牌と有効牌を表します。*wait*のn番目のビットの1/0はi番目の牌が有効牌であるかどうかを表します。同様に*disc*のn番目のビットの1/0はi番目の牌が不要牌であるかどうかを表します。
 
-> **NOTE:** The arguments passed by reference *disc* and *wait* represent necessary tiles and unnecessary tiles, respectively. The n th bit's 1/0 of *wait* represents the i th tile is whether necessary or not, and the n th bit's 1/0 of *disc* represents the i th tile is whether unecessary or not, as well.
-
-For example, calculate the necessary tiles and unneccessary tiles of the hand defined above. It requires one of *manzu* tiles (1 to 9) or one of *jihai* tiles (*East*, *West*) for winning, however one of *manzu* tiles (2, 4, 5, 7, 9) or one of  *jihai* tiles (*East*, *West*, *White*) is uneeded. The source code is as follows:
+例として, 先に定義した手牌の有効牌と不要牌を計算します。この手牌の有効牌はピンズ(1から9)と東, 西で, 不要牌は東, 西, 白です。ソースコードは以下のようになります。
 
 ```cpp
 #include <iostream>
@@ -95,7 +92,7 @@ int main()
   return 0;
 }
 ```
-The output:
+出力:
 ```
 2
 1
@@ -103,15 +100,15 @@ The output:
 0000011000000000111111111000000000
 ```
 
-> **NOTE:** A compiler compatiable with C++11 or higher is needed.
+> **NOTE:** C++11以上に対応したコンパイラが必要です。
 
-## Sample Program
-This program simultes single player mahjong. In each round, it discards one of unnecessary tiles, and then maximize the number of necessary tiles.
+## サンプルプログラム
+一人麻雀シミュレーションを行います。各巡目でシャンテン数を不変に保ち, 打牌後の有効牌の枚数が最大となるように打牌を行います。
 
 ```
 $ gunzip index_dw_h.txt.gz index_dw_s.txt.gz
 $ make
-$ ./prob.out [number of games (e.g. 1,000,000)]
+$ ./prob.out [局数(e.g. 1,000,000)]
 $ cat result.txt
 Number of Tiles         14
 Total                   1000000
@@ -138,12 +135,12 @@ Turn    Shanten Number (-1 - 6)                                         Hora    
 17      192032  508775  268240  30169   780     4       0       0       0.192032        0.700807        0.138902
 ```
 
-- The first line shows the number of hand tiles, the second line shows the number of games, and the third line shows the execution time (milliseconds).
+- 1行目は手牌の枚数, 2行目は局数, 3行目は実行時間(ミリ秒)を示しています。
 
-- The sixth line onward shows the ratio of each shanten number (-1 to 6), winning ratios, *tempai* ratios, expected values of shanten numbers from left to right. The final line shows that the winning rate in single player mahjong is about 19%.
+- 6行目以降は, 左から順に巡目, 各シャンテン数の割合(-1から6), 和了率, 聴牌率, シャンテン数期待値を示しています。最終行に見ると一人麻雀の和了率が約19%であることがわかります。
 
-- The graph belows shows the ratios and expected values of shanten number in each round.
+- 各巡目に対するシャンテン数の割合と期待値を図示すると以下のようになります。
 
-![ratio of each shanten number](ratio.png "ratio of shanten number")
+![シャンテン数の割合](ratio.png "シャンテン数の割合")
 
-![expected values of shanten numbers](expected_value.png "expected values of shanten numbers")
+![シャンテン数の期待値](expected_value.png "シャンテン数の期待値")

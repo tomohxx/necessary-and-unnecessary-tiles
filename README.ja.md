@@ -36,22 +36,22 @@ int hand[34] = {
 2. シャンテン数と有効牌・不要牌を計算します。
 - (a) *n*面子一雀頭形:
 ```cpp
-int Calsht::calc_lh(int* hand, int n, unsigned long long& disc, unsigned long long& wait)
+int CalshtDW::calc_lh(int* hand, int n, unsigned long long& disc, unsigned long long& wait)
 ```
 
 > **NOTE:** 通常, *n*には手牌の枚数を3で割った値を代入する。
 
 - (b) 七対子:
 ```cpp
-int Calsht::calc_sp(int* hand, unsigned long long& disc, unsigned long long& wait)
+int CalshtDW::calc_sp(int* hand, unsigned long long& disc, unsigned long long& wait)
 ```
 - (c) 国士無双:
 ```cpp
-int Calsht::calc_to(int* hand, unsigned long long& disc, unsigned long long& wait)
+int CalshtDW::calc_to(int* hand, unsigned long long& disc, unsigned long long& wait)
 ```
 - (d) 一般形:
 ```cpp
-int Calsht::operator()(int* hand, int n, int& mode, unsigned long long& disc, unsigned long long& wait)
+int CalshtDW::operator()(int* hand, int n, int& mode, unsigned long long& disc, unsigned long long& wait)
 ```
 > **NOTE:** *mode*はどのあがりパターンがシャンテン数の最小値を与えるかを表します。n面子一雀頭形の場合は1, 七対子の場合は2, 国士無双の場合は4です。複数のあがりパターンでシャンテン数が最小となる場合は, それらのビット論理和が*mode*となります。よって*mode*は1から7までの値をとりえます。
 
@@ -94,7 +94,7 @@ int main()
 ```
 出力:
 ```
-2
+3
 1
 0010011000000000101011010000000000
 0000011000000000111111111000000000

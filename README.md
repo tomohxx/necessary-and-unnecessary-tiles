@@ -38,22 +38,22 @@ int hand[34] = {
 2. Calculate the necessary tiles and the unnecessary tiles.
 - (a) For winnig hands composed of *n* tile groups and a pair:
 ```cpp
-int Calsht::calc_lh(int* hand, int n, unsigned long long& disc, unsigned long long& wait)
+int CalshtDW::calc_lh(int* hand, int n, unsigned long long& disc, unsigned long long& wait)
 ```
 
 > **NOTE:** Normally, substitute the value obtained by dividing the number of tiles by 3 into _n_.
 
 - (b) For winning hands of Seven Pairs:
 ```cpp
-int Calsht::calc_sp(int* hand, unsigned long long& disc, unsigned long long& wait)
+int CalshtDW::calc_sp(int* hand, unsigned long long& disc, unsigned long long& wait)
 ```
 - (c) For winnig hands of Thirteen Orphans:
 ```cpp
-int Calsht::calc_to(int* hand, unsigned long long& disc, unsigned long long& wait)
+int CalshtDW::calc_to(int* hand, unsigned long long& disc, unsigned long long& wait)
 ```
 - (d) For winning hands of which the shanten number is minimum in above hands:
 ```cpp
-int Calsht::operator()(int* hand, int n, int& mode, unsigned long long& disc, unsigned long long& wait)
+int CalshtDW::operator()(int* hand, int n, int& mode, unsigned long long& disc, unsigned long long& wait)
 ```
 
 > **NOTE:** The argument *mode* above represents which winning pattern of the hand gives the minimum shanten number. When the pattern is (a), *mode* is 1, when (b): 2, (c):4. If there are multiple patters, *mode* is bitwise OR of them. Therefore, *mode* is one of the values 1 to 7.
@@ -97,7 +97,7 @@ int main()
 ```
 The output:
 ```
-2
+3
 1
 0010011000000000101011010000000000
 0000011000000000111111111000000000

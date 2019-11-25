@@ -147,3 +147,11 @@ Turn    Shanten Number (-1 - 6)                                         Hora    
 ![ratio of each shanten number](ratio.png "ratio of shanten number")
 
 ![expected values of shanten numbers](expected_value.png "expected values of shanten numbers")
+
+## Building tables (Unneeded)
+- Build tables of parameters required for calculating necesaary tiles and unnecessary tiles. Make "index_dw_h.txt" and "index_dw_s.txt". 
+
+```
+$ make mkind2.out
+$ ./mkind2.out
+```

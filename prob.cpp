@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <chrono>
 #include <bitset>
+#include <cstdint>
 #include "calsht_dw.hpp"
 
 int main(int argc, char* argv[])
@@ -26,8 +27,8 @@ int main(int argc, char* argv[])
   int sht[18][8] = {};
   CalshtDW calsht;
   int mode;
-  unsigned long long disc;
-  unsigned long long wait;
+  std::int64_t disc;
+  std::int64_t wait;
   
   if(!calsht) return 1;
   

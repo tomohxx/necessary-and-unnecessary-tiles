@@ -144,3 +144,11 @@ Turn    Shanten Number (-1 - 6)                                         Hora    
 ![シャンテン数の割合](ratio.png "シャンテン数の割合")
 
 ![シャンテン数の期待値](expected_value.png "シャンテン数の期待値")
+
+## テーブルの構築 (不要)
+- 有効牌・不要牌の計算に必要なパラメータテーブルを構築します。index_dw_h.txt, index_dw_s.txtを作成します。
+
+```
+$ make mkind2.out
+$ ./mkind2.out
+```

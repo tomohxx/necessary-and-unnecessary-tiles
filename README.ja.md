@@ -1,4 +1,4 @@
-# YuukouhaiFuyouhaiCalculator
+# Yuukouhai Fuyouhai Calculator
 麻雀におけるシャンテン数および有効牌・不要牌を計算する。
 
 [Read this in English.](README.md)

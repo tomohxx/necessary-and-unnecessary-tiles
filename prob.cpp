@@ -15,11 +15,11 @@ int main(int argc, char* argv[])
   if(argc != 2){
     return 1;
   }
-  
+
   const int K = 34;
   const int M = 14;
   const int N = std::atoi(argv[1]);
-  
+
   std::array<int,K> hd;
   std::array<int,K> wl;
   std::array<int,K> cnt;
@@ -29,45 +29,45 @@ int main(int argc, char* argv[])
   int mode;
   std::int64_t disc;
   std::int64_t wait;
-  
+
   if(!calsht) return 1;
-  
+
   std::mt19937 rand(std::random_device{}());
   std::ofstream fout("result.txt");
-  
+
   for(int i=0; i<4; ++i){
     for(int j=0; j<K; ++j){
       wall[K*i+j] = j;
     }
   }
-  
+
   auto start = std::chrono::system_clock::now();
-  
+
   for(int i=0; i<N; ++i){
     hd.fill(0);
     wl.fill(4);
-    
+
     for(int j=1; j<=M+17; ++j){
       int n = rand()%(4*K-j+1);
       ++hd[wall[n]];
       --wl[wall[n]];
       std::swap(wall[n],wall[4*K-j]);
-      
+
       if(j>=M){
         int num = calsht(hd.data(),4,mode,disc,wait);
         ++sht[j-M][num];
-        
+
         if(num>0){
           std::bitset<K> bs1(disc);
           cnt.fill(-1);
-          
+
           for(int k=0; k<K; ++k){
             if(bs1[k]){
               --hd[k];
               calsht(hd.data(),4,mode,disc,wait);
               std::bitset<K> bs2(wait);
               cnt[k] = 0;
-              
+
               for(int l=0; l<K; ++l){
                 cnt[k] += bs2[l] ? wl[l]:0;
               }
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
           n = rand()%K;
           int tile = n;
           int max = cnt[n];
-          
+
           for(int k=n+1; k<n+K; ++k){
             if(cnt[k%K]>max){
               tile = k%K;
@@ -97,9 +97,9 @@ int main(int argc, char* argv[])
       }
     }
   }
-  
+
   auto end = std::chrono::system_clock::now();
-  
+
   fout.setf(std::ios::left,std::ios::adjustfield);
   fout << std::setw(24) << "Number of Tiles" << std::setw(16) << M << '\n';
   fout << std::setw(24) << "Total" << std::setw(16) << N << '\n';
@@ -109,13 +109,13 @@ int main(int argc, char* argv[])
   for(int i=0; i<18; ++i){
     fout << i << '\t';
     double ev = 0;
-    
+
     for(int j=0; j<8; ++j){
       ev += (j-1)*sht[i][j];
       fout << sht[i][j] << '\t';
     }
     fout << 1.0*sht[i][0]/N << '\t' << 1.0*(sht[i][0]+sht[i][1])/N << '\t' << ev/N << '\n';
   }
-  
+
   return 0;
 }

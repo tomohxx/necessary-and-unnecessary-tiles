@@ -11,15 +11,15 @@ private:
 
   std::vector<Vec> mp1;
   std::vector<Vec> mp2;
-  
+
   Iter itr1;
   Iter itr2;
 
   void shift(int& lv, int rv, std::int64_t& lx, std::int64_t rx, std::int64_t& ly, std::int64_t ry) const;
-  void add(Vec& lhs, const Vec& rhs) const;
-  void add(Vec& lhs, const Vec& rhs, int j) const;
+  void add1(Vec& lhs, const Vec& rhs, int m) const;
+  void add2(Vec& lhs, const Vec& rhs, int m) const;
   Iter read_file(Iter first, Iter last, const char* filename) const;
-  
+
 public:
   CalshtDW();
   int calc_lh(const int* t, int m, std::int64_t& disc, std::int64_t& wait) const;

@@ -9,9 +9,9 @@ void CalshtDW::shift(int& lv, const int rv, std::int64_t& lx, const std::int64_t
   else if(lv>rv){lv = rv; lx = rx; ly = ry;}
 }
 
-void CalshtDW::add(Vec& lhs, const Vec& rhs) const
+void CalshtDW::add1(Vec& lhs, const Vec& rhs, const int m) const
 {
-  for(int j=9; j>=5; --j){
+  for(int j=m+5; j>=5; --j){
     int sht = lhs[j]+rhs[0];
     std::int64_t disc_ = (lhs[j+10]<<9)|rhs[10];
     std::int64_t wait_ = (lhs[j+20]<<9)|rhs[20];
@@ -25,7 +25,7 @@ void CalshtDW::add(Vec& lhs, const Vec& rhs) const
     lhs[j+10] = disc_;
     lhs[j+20] = wait_;
   }
-  for(int j=4; j>=0; --j){
+  for(int j=m; j>=0; --j){
     int sht = lhs[j]+rhs[0];
     std::int64_t disc_ = (lhs[j+10]<<9)|rhs[10];
     std::int64_t wait_ = (lhs[j+20]<<9)|rhs[20];
@@ -38,9 +38,10 @@ void CalshtDW::add(Vec& lhs, const Vec& rhs) const
     lhs[j+20] = wait_;
   }
 }
-  
-void CalshtDW::add(Vec& lhs, const Vec& rhs, const int j) const
+
+void CalshtDW::add2(Vec& lhs, const Vec& rhs, const int m) const
 {
+  int j = m+5;
   int sht = lhs[j]+rhs[0];
   std::int64_t disc_ = (lhs[j+10]<<9)|rhs[10];
   std::int64_t wait_ = (lhs[j+20]<<9)|rhs[20];
@@ -59,7 +60,7 @@ CalshtDW::Iter CalshtDW::read_file(Iter first, Iter last, const char* filename) 
 {
   std::ifstream fin(filename);
   Vec vec(30);
-  
+
   if(fin.is_open()){
     int num;
 
@@ -86,15 +87,15 @@ bool CalshtDW::operator!() const
 {
   return mp1.empty() || mp2.empty() || itr1==mp1.begin() || itr2==mp2.begin();
 }
-  
+
 int CalshtDW::calc_lh(const int* t, const int m, std::int64_t& disc, std::int64_t& wait) const
 {
   Vec ret = mp2[std::accumulate(t+28,t+34,t[27],[](int x, int y){return 5*x+y;})];
 
-  add(ret, mp1[std::accumulate(t+19,t+27,t[18],[](int x, int y){return 5*x+y;})]);
-  add(ret, mp1[std::accumulate(t+10,t+18,t[9],[](int x, int y){return 5*x+y;})]);
-  add(ret, mp1[std::accumulate(t+1,t+9,t[0],[](int x, int y){return 5*x+y;})], 5+m);
-  
+  add1(ret, mp1[std::accumulate(t+19,t+27,t[18],[](int x, int y){return 5*x+y;})], m);
+  add1(ret, mp1[std::accumulate(t+10,t+18,t[9],[](int x, int y){return 5*x+y;})], m);
+  add2(ret, mp1[std::accumulate(t+1,t+9,t[0],[](int x, int y){return 5*x+y;})], m);
+
   disc = ret[15+m];
   wait = ret[25+m];
   return static_cast<int>(ret[5+m]);
@@ -122,9 +123,9 @@ int CalshtDW::calc_sp(const int* t, std::int64_t& disc, std::int64_t& wait) cons
   }
   if(kind>7) disc |= disc_;
   else if(kind<7) wait |= wait_;
-  
+
   if(pair==7) wait = UINT64_C(0);
-  
+
   return 7-pair+(kind<7 ? 7-kind:0);
 }
 
@@ -153,10 +154,10 @@ int CalshtDW::calc_to(const int* t, std::int64_t& disc, std::int64_t& wait) cons
   }
   if(pair>=2) disc |= disc_;
   else if(pair==0) wait |= wait_;
-  
+
   return 14-kind-(pair>0 ? 1:0);
 }
-  
+
 int CalshtDW::operator()(const int* t, const int m, int& mode, std::int64_t& disc, std::int64_t& wait) const
 {
   if(m==4){
@@ -165,18 +166,18 @@ int CalshtDW::operator()(const int* t, const int m, int& mode, std::int64_t& dis
     int sht = calc_lh(t,m,disc,wait);
     int sht_ = calc_sp(t,disc_,wait_);
     mode = 1;
-    
+
     if(sht>sht_){
       sht = sht_; mode = 2; disc = disc_; wait = wait_;
     }
     else if(sht==sht_){
       mode |= 2; disc |= disc_; wait |= wait_;
     }
-    
+
     disc_ = UINT64_C(0);
     wait_ = UINT64_C(0);
     sht_ = calc_to(t,disc_,wait_);
-    
+
     if(sht>sht_){
       sht = sht_; mode = 4; disc = disc_; wait = wait_;
     }

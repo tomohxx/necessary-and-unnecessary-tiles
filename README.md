@@ -108,7 +108,7 @@ $ make
 
 ### Execute
 ```
-$ ./sample [number of games (e.g. 1,000,000)]
+$ ./sample [number of rounds (e.g. 1,000,000)]
 $ cat result.txt
 Number of Tiles         14
 Total                   1000000

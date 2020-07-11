@@ -95,13 +95,17 @@ $ gunzip index_dw_h.txt.gz index_dw_s.txt.gz
 ### Build
 - Debug mode
 ```
-$ cmake . -DCMAKE_BUILD_TYPE=Debug
+$ mkdir build
+$ cd build
+$ cmake .. -DCMAKE_BUILD_TYPE=Debug
 $ make
 ```
 
 - Release mode
 ```
-$ cmake . -DCMAKE_BUILD_TYPE=Release
+$ mkdir build
+$ cd build
+$ cmake .. -DCMAKE_BUILD_TYPE=Release
 $ make
 ```
 > **NOTE:** A compiler compatiable with C++11 or higher is needed.
@@ -150,8 +154,7 @@ Enable `THREE_PLAYER`.
 
 Example:
 ```
-$ cmake . -DCMAKE_BUILD_TYPE=Release -DTHREE_PLAYER=on
-$ make
+$ cmake .. -DCMAKE_BUILD_TYPE=Release -DTHREE_PLAYER=on
 ```
 
 ## Building tables (Unneeded)

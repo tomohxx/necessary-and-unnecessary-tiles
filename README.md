@@ -14,8 +14,8 @@ A tool for calculating necesaary tiles and unnecessary tiles for winning hands i
   - called "yojouhai" in Japanese.
 
 ## Usage
-1. Prepare an int-type array of length 34 representing a hand.
-- The n th element stores the number of n th tiles.
+1. Prepare a `std::vector<int>` array representing a hand.
+- The `n` th element stores the number of `n` th tiles.
 
 ||1|2|3|4|5|6|7|8|9|
 |:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|
@@ -27,65 +27,46 @@ A tool for calculating necesaary tiles and unnecessary tiles for winning hands i
 - For example, if you have *manzu* tiles (1, 2, 3), *pinzu* tiles (2, 4, 5, 7, 7, 9), and *jihai* tiles (*East*, *West*, *White*, *White*, *White*), define the following array.
 
 ```cpp
-int hand[34] = {
-    1,1,1,0,0,0,0,0,0, //Manzu
-    0,1,0,1,1,0,2,0,1, //Pinzu
-    0,0,0,0,0,0,0,0,0, //Souzu
-    1,0,1,0,3,0,0 //Jihai
+std::vector<int> hand = {
+  1,1,1,0,0,0,0,0,0, //Manzu
+  0,1,0,1,1,0,2,0,1, //Pinzu
+  0,0,0,0,0,0,0,0,0, //Souzu
+  1,0,1,0,3,0,0 //Jihai
 };
 ```
 
-2. Calculate the necessary tiles and the unnecessary tiles.
-- (a) For winnig hands composed of *n* tile groups and a pair:
+2. Calculate the shanten number, necessary tiles and the unnecessary tiles.
 ```cpp
-int CalshtDW::calc_lh(int* hand, int n, unsigned long long& disc, unsigned long long& wait)
+std::tuple<int,int,std::int64_t,std::int64_t> CalshtDW::operator()(const std::vector<int>& hand, int m, int mode)
 ```
 
-> **NOTE:** Normally, substitute the value obtained by dividing the number of tiles by 3 into _n_.
+> **NOTE:** Normally, substitute the value obtained by dividing the number of tiles by 3 into `m`.
 
-- (b) For winning hands of Seven Pairs:
-```cpp
-int CalshtDW::calc_sp(int* hand, unsigned long long& disc, unsigned long long& wait)
-```
-- (c) For winnig hands of Thirteen Orphans:
-```cpp
-int CalshtDW::calc_to(int* hand, unsigned long long& disc, unsigned long long& wait)
-```
-- (d) For winning hands of which the shanten number is minimum in above hands:
-```cpp
-int CalshtDW::operator()(int* hand, int n, int& mode, unsigned long long& disc, unsigned long long& wait)
-```
+> **NOTE:** `mode` specifies for which winning pattern calculate shanten number. When the pattern is "General Form", `mode` is 1, when "Seven Pairs": 2, "Thirteen Orphans": 4. When calculating the Shanten number for multiple winning patterns, specify the logical sum of them.
 
-> **NOTE:** The argument *mode* above represents which winning pattern of the hand gives the minimum shanten number. When the pattern is (a), *mode* is 1, when (b): 2, (c):4. If there are multiple patters, *mode* is bitwise OR of them. Therefore, *mode* is one of the values 1 to 7.
-
-> **NOTE:** Each method returns a value of Shanten number + 1.
-
-> **NOTE:** The arguments passed by reference *disc* and *wait* represent necessary tiles and unnecessary tiles, respectively. The n th bit's 1/0 of *wait* represents the i th tile is whether necessary or not, and the n th bit's 1/0 of *disc* represents the i th tile is whether unecessary or not, as well.
+> **NOTE:** This method returns the value of shunten number + 1, mode, necessary tiles, unnecessary tiles. The mode indicates which winning pattern (General Form, Seven Pairs, Thirteen Orphans) has the minimum shunten number. Each valid/unnecessary tile is represented by a 64-bit integer. Whether 1 or 0 of the `i`-th bit indicates whether the `i`-th tile is a necessary tile (or an unnecessary tile) or not.
 
 For example, calculate the necessary tiles and unneccessary tiles of the hand defined above. It requires one of *manzu* tiles (1 to 9) or one of *jihai* tiles (*East*, *West*) for winning, however one of *manzu* tiles (2, 4, 5, 7, 9) or one of  *jihai* tiles (*East*, *West*, *White*) is uneeded. The source code is as follows:
 
 ```cpp
 #include <iostream>
 #include <bitset>
+#include <vector>
 #include "calsht_dw.hpp"
 
 int main()
 {
-  // number of kinds of tiles
-  constexpr int K = 34;
-
   CalshtDW calsht;
-  int mode;
-  int hand[K] = {
-      1,1,1,0,0,0,0,0,0,// manzu
-      0,1,0,1,1,0,2,0,1,// pinzu
-      0,0,0,0,0,0,0,0,0,// souzu
-      1,0,1,0,3,0,0// jihai
+  std::vector<int> hand = {
+    1,1,1,0,0,0,0,0,0,// manzu
+    0,1,0,1,1,0,2,0,1,// pinzu
+    0,0,0,0,0,0,0,0,0,// souzu
+    1,0,1,0,3,0,0// jihai
   };
   unsigned long long int disc;
   unsigned long long int wait;
 
-  int sht = calsht(hand, 4, mode, disc, wait);
+  auto [sht, mode, disc, wait] = calsht(hand, 4, 7);
 
   std::cout << sht << std::endl;
   std::cout << mode << std::endl;
@@ -95,7 +76,7 @@ int main()
   return 0;
 }
 ```
-The output:
+Output:
 ```
 3
 1
@@ -103,15 +84,31 @@ The output:
 0000011000000000111111111000000000
 ```
 
-> **NOTE:** A compiler compatiable with C++11 or higher is needed.
-
 ## Sample Program
 This program simultes single player mahjong. In each round, it discards one of unnecessary tiles, and then maximize the number of necessary tiles.
 
+### Extract
 ```
 $ gunzip index_dw_h.txt.gz index_dw_s.txt.gz
+```
+
+### Build
+- Debug mode
+```
+$ cmake . -DCMAKE_BUILD_TYPE=Debug
 $ make
-$ ./prob.out [number of games (e.g. 1,000,000)]
+```
+
+- Release mode
+```
+$ cmake . -DCMAKE_BUILD_TYPE=Release
+$ make
+```
+> **NOTE:** A compiler compatiable with C++11 or higher is needed.
+
+### Execute
+```
+$ ./sample [number of games (e.g. 1,000,000)]
 $ cat result.txt
 Number of Tiles         14
 Total                   1000000
@@ -148,10 +145,18 @@ Turn    Shanten Number (-1 - 6)                                         Hora    
 
 ![expected values of shanten numbers](expected_value.png "expected values of shanten numbers")
 
+## Three Player Mahjong mode
+Enable `THREE_PLAYER`.
+
+Example:
+```
+$ cmake . -DCMAKE_BUILD_TYPE=Release -DTHREE_PLAYER=on
+$ make
+```
+
 ## Building tables (Unneeded)
 - Build tables of parameters required for calculating necesaary tiles and unnecessary tiles. Make "index_dw_h.txt" and "index_dw_s.txt". 
 
 ```
-$ make mkind2.out
 $ ./mkind2.out
 ```

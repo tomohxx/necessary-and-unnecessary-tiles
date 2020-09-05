@@ -87,11 +87,6 @@ Output:
 ## Sample Program
 This program simultes single player mahjong. In each round, it discards one of unnecessary tiles, and then maximize the number of necessary tiles.
 
-### Extract
-```
-$ gunzip index_dw_h.txt.gz index_dw_s.txt.gz
-```
-
 ### Build
 - Debug mode
 ```

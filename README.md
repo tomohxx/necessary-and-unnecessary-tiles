@@ -57,6 +57,10 @@ For example, calculate the necessary tiles and unneccessary tiles of the hand de
 int main()
 {
   CalshtDW calsht;
+
+  // Set the location of shanten tables
+  calsht.initialize(".");
+
   std::vector<int> hand = {
     1,1,1,0,0,0,0,0,0,// manzu
     0,1,0,1,1,0,2,0,1,// pinzu

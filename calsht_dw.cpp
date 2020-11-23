@@ -77,13 +77,13 @@ void CalshtDW::add2(Vec& lhs, const Vec& rhs, const int m) const
   lhs[j+20] = wait_;
 }
 
-CalshtDW::Iter CalshtDW::read_file(Iter first, Iter last, const char* file_name) const
+CalshtDW::Iter CalshtDW::read_file(Iter first, Iter last, std::filesystem::path file) const
 {
-  std::ifstream fin(file_name);
+  std::ifstream fin(file);
   Vec vec(30);
 
   if(!fin){
-    throw std::runtime_error("Reading file does not exists");
+    throw std::runtime_error("Reading file does not exist: " + file.string());
   }
 
   int num;
@@ -186,10 +186,10 @@ std::tuple<int,std::int64_t,std::int64_t> CalshtDW::calc_to(const int* t) const
   return {14-kind-(pair>0 ? 1:0),disc,wait};
 }
 
-CalshtDW::CalshtDW() : mp1(std::vector<Vec>(1953125,Vec(30))), mp2(std::vector<Vec>(78125,Vec(30))), itr1(mp1.begin()), itr2(mp2.begin())
+void CalshtDW::initialize(std::filesystem::path dir)
 {
-  itr1 = read_file(mp1.begin(),mp1.end(),"index_dw_s.txt");
-  itr2 = read_file(mp2.begin(),mp2.end(),"index_dw_h.txt");
+  read_file(mp1.begin(),mp1.end(),dir/"index_dw_s.txt");
+  read_file(mp2.begin(),mp2.end(),dir/"index_dw_h.txt");
 }
 
 std::tuple<int,int,std::int64_t,std::int64_t> CalshtDW::operator()(const std::vector<int>& t, const int m, const int mode) const

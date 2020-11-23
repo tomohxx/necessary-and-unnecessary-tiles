@@ -32,6 +32,8 @@ int main(int argc, char* argv[])
   int table[18][8] = {};
   CalshtDW calsht;
 
+  calsht.initialize(INDEX_FILE_PATH);
+
   std::mt19937_64 rand(std::random_device{}());
   std::ofstream fout("result.txt");
 

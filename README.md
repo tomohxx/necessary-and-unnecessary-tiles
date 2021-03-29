@@ -111,7 +111,7 @@ $ make
 
 ### Execute
 ```
-$ ./sample [number of rounds (e.g. 1,000,000)]
+$ ./sample [number of rounds (e.g. 1000000)]
 $ cat result.txt
 Number of Tiles         14
 Total                   1000000
@@ -157,8 +157,11 @@ $ cmake .. -DCMAKE_BUILD_TYPE=Release -DTHREE_PLAYER=on
 ```
 
 ## Building tables (Unneeded)
-- Build tables of parameters required for calculating necesaary tiles and unnecessary tiles. Make "index_dw_h.txt" and "index_dw_s.txt". 
+Build tables of parameters required for calculating necesaary tiles and unnecessary tiles. Make "index_dw_h.txt" and "index_dw_s.txt". 
 
 ```
 $ ./mkind2.out
 ```
+
+## License
+GNU General Public License v3.0.

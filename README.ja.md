@@ -107,7 +107,7 @@ $ make
 
 ### 実行
 ```
-$ ./sample [局数(e.g. 1,000,000)]
+$ ./sample [局数(e.g. 1000000)]
 $ cat result.txt
 Number of Tiles         14
 Total                   1000000
@@ -153,8 +153,11 @@ $ cmake .. -DCMAKE_BUILD_TYPE=Release -DTHREE_PLAYER=on
 ```
 
 ## テーブルの構築 (不要)
-- 有効牌・不要牌の計算に必要なパラメータテーブルを構築します. index_dw_h.txt, index_dw_s.txtを作成します.
+有効牌・不要牌の計算に必要なパラメータテーブルを構築します. index_dw_h.txt, index_dw_s.txtを作成します.
 
 ```
 $ ./mkind2
 ```
+
+## ライセンス
+GNU General Public License v3.0.

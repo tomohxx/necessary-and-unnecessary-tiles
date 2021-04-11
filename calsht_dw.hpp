@@ -28,7 +28,7 @@ private:
   std::tuple<int,int64_t,int64_t> calc_to(const int* t) const;
 
 public:
-  CalshtDW() : mp1(std::vector<RVec>(1953125,RVec(30))), mp2(std::vector<RVec>(78125,RVec(30))) {}
+  CalshtDW() : mp1(1953125, RVec(30)), mp2(78125, RVec(30)) {}
   void initialize(const std::string& dir);
   std::tuple<int,int,int64_t,int64_t> operator()(const std::vector<int>& t, int m, int mode) const;
 };

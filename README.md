@@ -1,4 +1,4 @@
-# Necessary or Unnecessary Tiles Calculator
+# Necessary and Unnecessary Tiles Calculator
 A tool for calculating necesaary tiles and unnecessary tiles for winning hands in Japanese mahjong.
 
 [Read this in Japanese (日本語).](README.ja.md)

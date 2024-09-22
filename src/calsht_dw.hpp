@@ -5,7 +5,6 @@
 #include <filesystem>
 #include <tuple>
 #include <vector>
-#include "constant.hpp"
 
 class CalshtDW {
 private:

@@ -6,6 +6,7 @@
 #include <stdexcept>
 #endif
 #include "calsht_dw.hpp"
+#include "constant.hpp"
 
 #ifdef THREE_PLAYER
 CalshtDW::RVec CalshtDW::index1(const int n) const

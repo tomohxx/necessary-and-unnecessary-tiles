@@ -9,6 +9,7 @@
 #include <bitset>
 #include <cstdint>
 #include "calsht_dw.hpp"
+#include "constant.hpp"
 
 int main(int argc, char* argv[])
 {

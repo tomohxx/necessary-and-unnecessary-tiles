@@ -70,8 +70,8 @@ int main()
 
   std::cout << sht << std::endl;
   std::cout << mode << std::endl;
-  std::cout << std::bitset<K>(disc) << std::endl;
-  std::cout << std::bitset<K>(wait) << std::endl;
+  std::cout << std::bitset<34>(disc) << std::endl;
+  std::cout << std::bitset<34>(wait) << std::endl;
 
   return 0;
 }

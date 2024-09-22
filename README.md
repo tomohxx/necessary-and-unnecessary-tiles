@@ -67,15 +67,13 @@ int main()
     0,0,0,0,0,0,0,0,0,// souzu
     1,0,1,0,3,0,0// jihai
   };
-  unsigned long long int disc;
-  unsigned long long int wait;
 
   auto [sht, mode, disc, wait] = calsht(hand, 4, 7);
 
   std::cout << sht << std::endl;
   std::cout << mode << std::endl;
-  std::cout << std::bitset<K>(disc) << std::endl;
-  std::cout << std::bitset<K>(wait) << std::endl;
+  std::cout << std::bitset<34>(disc) << std::endl;
+  std::cout << std::bitset<34>(wait) << std::endl;
 
   return 0;
 }

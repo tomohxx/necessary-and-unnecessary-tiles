@@ -8,18 +8,23 @@
 #include "calsht_dw.hpp"
 
 #ifdef THREE_PLAYER
-CalshtDW::Vec CalshtDW::index1(const int n) const
+CalshtDW::RVec CalshtDW::index1(const int n) const
 {
-  Vec ret(30);
+  RVec ret(30, INT32_C(0));
 
-  for (int i = 0; i < 5; ++i) {
-    ret[i] = (abs(3 * i - n) + 3 * i - n) / 2;
-    ret[5 + i] = (abs(3 * i + 2 - n) + 3 * i + 2 - n) / 2;
-    ret[10 + i] = (n > 3 * i ? INT64_C(1) << 8 : INT64_C(0));
-    ret[15 + i] = (n > 3 * i + 2 ? INT64_C(1) << 8 : INT64_C(0));
-    ret[20 + i] = (n < 3 * i ? INT64_C(1) << 8 : INT64_C(0));
-    ret[25 + i] = (n < 3 * i + 2 ? INT64_C(1) << 8 : INT64_C(0));
-  }
+  std::fill(ret.begin(), ret.begin() + 10, INT32_C(1024));
+
+  ret[0] = INT32_C(0);
+  ret[1] = std::max(3 - n, INT32_C(0));
+  ret[5] = std::max(2 - n, INT32_C(0));
+
+  ret[10] = (n > 0 ? INT32_C(1) << 8 : INT32_C(0));
+  ret[11] = (n > 3 ? INT32_C(1) << 8 : INT32_C(0));
+  ret[15] = (n > 2 ? INT32_C(1) << 8 : INT32_C(0));
+
+  ret[20] = INT32_C(0);
+  ret[21] = (n < 3 ? INT32_C(1) << 8 : INT32_C(0));
+  ret[25] = (n < 2 ? INT32_C(1) << 8 : INT32_C(0));
 
   return ret;
 }

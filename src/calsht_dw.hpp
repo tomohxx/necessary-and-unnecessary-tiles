@@ -1,36 +1,43 @@
 #ifndef CALSHT_DW_HPP
 #define CALSHT_DW_HPP
 
-#include <cstdint>
 #include <filesystem>
 #include <tuple>
 #include <vector>
+#ifndef ENABLE_NYANTEN
+#define ENABLE_NYANTEN false
+#endif
 
 class CalshtDW {
 private:
-  using LVec = std::vector<int64_t>;
-  using RVec = std::vector<int32_t>;
+  using LVec = std::vector<uint64_t>;
+  using RVec = std::vector<uint32_t>;
   using Iter = std::vector<RVec>::iterator;
 
   std::vector<RVec> mp1;
   std::vector<RVec> mp2;
 
-#ifdef THREE_PLAYER
   RVec index1(int n) const;
-#endif
-  void shift(int& lv, int rv, int64_t& lx, int64_t rx, int64_t& ly, int64_t ry) const;
-  void add1(LVec& lhs, const RVec& rhs, int m) const;
-  void add2(LVec& lhs, const RVec& rhs, int m) const;
-  Iter read_file(Iter first, Iter last, std::filesystem::path file) const;
-  std::tuple<int, int64_t, int64_t> calc_lh(const int* t, int m) const;
-  std::tuple<int, int64_t, int64_t> calc_sp(const int* t) const;
-  std::tuple<int, int64_t, int64_t> calc_to(const int* t) const;
+  void add1(LVec& lhs, const RVec& rhs, int m, int w) const;
+  void add2(LVec& lhs, const RVec& rhs, int m, int w) const;
+  void read_file(Iter first, Iter last, std::filesystem::path file) const;
+  std::tuple<int, uint64_t, uint64_t> calc_lh(const std::vector<int>& t,
+                                              int m,
+                                              const bool three_player = false) const;
+  std::tuple<int, uint64_t, uint64_t> calc_sp(const std::vector<int>& t,
+                                              bool three_player = false) const;
+  std::tuple<int, uint64_t, uint64_t> calc_to(const std::vector<int>& t) const;
 
 public:
   CalshtDW()
-      : mp1(1953125, RVec(30)), mp2(78125, RVec(30)) {}
+      : mp1(ENABLE_NYANTEN ? 405350 : 1953125, RVec(30)),
+        mp2(ENABLE_NYANTEN ? 43130 : 78125, RVec(30)) {}
   void initialize(const std::string& dir);
-  std::tuple<int, int, int64_t, int64_t> operator()(const std::vector<int>& t, int m, int mode) const;
+  std::tuple<int, int, uint64_t, uint64_t> operator()(const std::vector<int>& t,
+                                                      int m,
+                                                      int mode,
+                                                      bool check_hand = false,
+                                                      bool three_player = false) const;
 };
 
 #endif

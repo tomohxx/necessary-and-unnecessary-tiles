@@ -1,37 +1,17 @@
-#include <algorithm>
-#include <fstream>
-#include <numeric>
-#ifdef CHECK_HAND
-#include <sstream>
-#include <stdexcept>
-#endif
 #include "calsht_dw.hpp"
-#include "constant.hpp"
+#include "hash.hpp"
+#include <algorithm>
+#include <format>
+#include <fstream>
+#include <stdexcept>
+#include <type_traits>
+constexpr int NUM_TIDS = 34;
+const std::conditional<ENABLE_NYANTEN, NyantenHash<9>, DefaultHash<9>>::type hash1;
+const std::conditional<ENABLE_NYANTEN, NyantenHash<7>, DefaultHash<7>>::type hash2;
 
-#ifdef THREE_PLAYER
-CalshtDW::RVec CalshtDW::index1(const int n) const
-{
-  RVec ret(30, INT32_C(0));
-
-  std::fill(ret.begin(), ret.begin() + 10, INT32_C(1024));
-
-  ret[0] = INT32_C(0);
-  ret[1] = std::max(3 - n, INT32_C(0));
-  ret[5] = std::max(2 - n, INT32_C(0));
-
-  ret[10] = (n > 0 ? INT32_C(1) << 8 : INT32_C(0));
-  ret[11] = (n > 3 ? INT32_C(1) << 8 : INT32_C(0));
-  ret[15] = (n > 2 ? INT32_C(1) << 8 : INT32_C(0));
-
-  ret[20] = INT32_C(0);
-  ret[21] = (n < 3 ? INT32_C(1) << 8 : INT32_C(0));
-  ret[25] = (n < 2 ? INT32_C(1) << 8 : INT32_C(0));
-
-  return ret;
-}
-#endif
-
-void CalshtDW::shift(int& lv, const int rv, int64_t& lx, const int64_t rx, int64_t& ly, const int64_t ry) const
+void shift(uint64_t& lv, const uint64_t rv,
+           uint64_t& lx, const uint64_t rx,
+           uint64_t& ly, const uint64_t ry)
 {
   if (lv == rv) {
     lx |= rx;
@@ -44,123 +24,156 @@ void CalshtDW::shift(int& lv, const int rv, int64_t& lx, const int64_t rx, int64
   }
 }
 
-void CalshtDW::add1(LVec& lhs, const RVec& rhs, const int m) const
+CalshtDW::RVec CalshtDW::index1(const int n) const
+{
+  RVec ret(30, 0u);
+
+  std::fill_n(ret.begin(), 10, 14u);
+
+  ret[0] = 0u;
+  ret[1] = std::max(3u - n, 0u);
+  ret[5] = std::max(2u - n, 0u);
+
+  ret[10] = (n > 0 ? 1u : 0u);
+  ret[11] = (n > 3 ? 1u : 0u);
+  ret[15] = (n > 2 ? 1u : 0u);
+
+  ret[20] = 0u;
+  ret[21] = (n < 3 ? 1u : 0u);
+  ret[25] = (n < 2 ? 1u : 0u);
+
+  return ret;
+}
+
+void CalshtDW::add1(LVec& lhs, const RVec& rhs, const int m, const int w) const
 {
   for (int j = m + 5; j >= 5; --j) {
-    int sht = lhs[j] + rhs[0];
-    int64_t disc_ = (lhs[j + 10] << 9) | rhs[10];
-    int64_t wait_ = (lhs[j + 20] << 9) | rhs[20];
+    uint64_t sht = lhs[j] + rhs[0];
+    uint64_t disc = (lhs[j + 10] << w) | rhs[10];
+    uint64_t wait = (lhs[j + 20] << w) | rhs[20];
 
-    shift(sht, lhs[0] + rhs[j], disc_, (lhs[10] << 9) | rhs[j + 10], wait_, (lhs[20] << 9) | rhs[j + 20]);
+    shift(sht, lhs[0] + rhs[j],
+          disc, (lhs[10] << w) | rhs[j + 10],
+          wait, (lhs[20] << w) | rhs[j + 20]);
 
     for (int k = 5; k < j; ++k) {
-      shift(sht, lhs[k] + rhs[j - k], disc_, (lhs[k + 10] << 9) | rhs[j - k + 10], wait_, (lhs[k + 20] << 9) | rhs[j - k + 20]);
-      shift(sht, lhs[j - k] + rhs[k], disc_, (lhs[j - k + 10] << 9) | rhs[k + 10], wait_, (lhs[j - k + 20] << 9) | rhs[k + 20]);
+      shift(sht, lhs[k] + rhs[j - k],
+            disc, (lhs[k + 10] << w) | rhs[j - k + 10],
+            wait, (lhs[k + 20] << w) | rhs[j - k + 20]);
+      shift(sht, lhs[j - k] + rhs[k],
+            disc, (lhs[j - k + 10] << w) | rhs[k + 10],
+            wait, (lhs[j - k + 20] << w) | rhs[k + 20]);
     }
 
     lhs[j] = sht;
-    lhs[j + 10] = disc_;
-    lhs[j + 20] = wait_;
+    lhs[j + 10] = disc;
+    lhs[j + 20] = wait;
   }
 
   for (int j = m; j >= 0; --j) {
-    int sht = lhs[j] + rhs[0];
-    int64_t disc_ = (lhs[j + 10] << 9) | rhs[10];
-    int64_t wait_ = (lhs[j + 20] << 9) | rhs[20];
+    uint64_t sht = lhs[j] + rhs[0];
+    uint64_t disc = (lhs[j + 10] << w) | rhs[10];
+    uint64_t wait = (lhs[j + 20] << w) | rhs[20];
 
     for (int k = 0; k < j; ++k) {
-      shift(sht, lhs[k] + rhs[j - k], disc_, (lhs[k + 10] << 9) | rhs[j - k + 10], wait_, (lhs[k + 20] << 9) | rhs[j - k + 20]);
+      shift(sht, lhs[k] + rhs[j - k],
+            disc, (lhs[k + 10] << w) | rhs[j - k + 10],
+            wait, (lhs[k + 20] << w) | rhs[j - k + 20]);
     }
 
     lhs[j] = sht;
-    lhs[j + 10] = disc_;
-    lhs[j + 20] = wait_;
+    lhs[j + 10] = disc;
+    lhs[j + 20] = wait;
   }
 }
 
-void CalshtDW::add2(LVec& lhs, const RVec& rhs, const int m) const
+void CalshtDW::add2(LVec& lhs, const RVec& rhs, const int m, const int w) const
 {
-  int j = m + 5;
-  int sht = lhs[j] + rhs[0];
+  const int j = m + 5;
+  uint64_t sht = lhs[j] + rhs[0];
+  uint64_t disc = (lhs[j + 10] << w) | rhs[10];
+  uint64_t wait = (lhs[j + 20] << w) | rhs[20];
 
-  int64_t disc_ = (lhs[j + 10] << 9) | rhs[10];
-  int64_t wait_ = (lhs[j + 20] << 9) | rhs[20];
-  shift(sht, lhs[0] + rhs[j], disc_, (lhs[10] << 9) | rhs[j + 10], wait_, (lhs[20] << 9) | rhs[j + 20]);
+  shift(sht, lhs[0] + rhs[j],
+        disc, (lhs[10] << w) | rhs[j + 10],
+        wait, (lhs[20] << w) | rhs[j + 20]);
 
   for (int k = 5; k < j; ++k) {
-    shift(sht, lhs[k] + rhs[j - k], disc_, (lhs[k + 10] << 9) | rhs[j - k + 10], wait_, (lhs[k + 20] << 9) | rhs[j - k + 20]);
-    shift(sht, lhs[j - k] + rhs[k], disc_, (lhs[j - k + 10] << 9) | rhs[k + 10], wait_, (lhs[j - k + 20] << 9) | rhs[k + 20]);
+    shift(sht, lhs[k] + rhs[j - k],
+          disc, (lhs[k + 10] << w) | rhs[j - k + 10],
+          wait, (lhs[k + 20] << w) | rhs[j - k + 20]);
+    shift(sht, lhs[j - k] + rhs[k],
+          disc, (lhs[j - k + 10] << w) | rhs[k + 10],
+          wait, (lhs[j - k + 20] << w) | rhs[k + 20]);
   }
 
   lhs[j] = sht;
-  lhs[j + 10] = disc_;
-  lhs[j + 20] = wait_;
+  lhs[j + 10] = disc;
+  lhs[j + 20] = wait;
 }
 
-CalshtDW::Iter CalshtDW::read_file(Iter first, Iter last, std::filesystem::path file) const
+void CalshtDW::read_file(Iter first, Iter last, std::filesystem::path file) const
 {
-  std::ifstream fin(file);
+  std::ifstream fin(file, std::ios_base::in | std::ios_base::binary);
 
   if (!fin) {
-    throw std::runtime_error("Reading file does not exist: " + file.string());
+    throw std::runtime_error(std::format("Reading file does not exist: {}", file.string()));
   }
-
-  int tmp;
 
   for (; first != last; ++first) {
     for (int j = 0; j < 10; ++j) {
-      fin >> tmp;
-      (*first)[j] = tmp & ((1 << 4) - 1);
-      (*first)[j + 10] = (tmp >> 4) & ((1 << 9) - 1);
-      (*first)[j + 20] = (tmp >> 13) & ((1 << 9) - 1);
+      RVec::value_type tmp;
+
+      fin.read(reinterpret_cast<char*>(&tmp), sizeof(RVec::value_type));
+      (*first)[j] = tmp & 0xF;
+      (*first)[j + 10] = (tmp >> 4) & 0x1FF;
+      (*first)[j + 20] = (tmp >> 13) & 0x1FF;
     }
   }
-
-  return first;
 }
 
-std::tuple<int, int64_t, int64_t> CalshtDW::calc_lh(const int* t, const int m) const
+std::tuple<int, uint64_t, uint64_t> CalshtDW::calc_lh(const std::vector<int>& t,
+                                                      const int m,
+                                                      const bool three_player) const
 {
   LVec ret = [](const RVec& rhs) {
-    return LVec(rhs.begin(), rhs.end());
-  }(mp2[std::accumulate(t + 28, t + 34, t[27], [](int x, int y) { return 5 * x + y; })]);
+    return LVec(rhs.cbegin(), rhs.cend());
+  }(mp2[hash2(t.cbegin() + 27)]);
 
-  add1(ret, mp1[std::accumulate(t + 19, t + 27, t[18], [](int x, int y) { return 5 * x + y; })], m);
-  add1(ret, mp1[std::accumulate(t + 10, t + 18, t[9], [](int x, int y) { return 5 * x + y; })], m);
+  add1(ret, mp1[hash1(t.cbegin() + 18)], m, 9);
+  add1(ret, mp1[hash1(t.cbegin() + 9)], m, 9);
 
-#ifdef THREE_PLAYER
-  add1(ret, index1(t[8]), m);
-  add2(ret, index1(t[0]), m);
+  if (three_player) {
+    add1(ret, index1(t[8]), m, 1);
+    add2(ret, index1(t[0]), m, 8);
+  }
+  else {
+    add2(ret, mp1[hash1(t.cbegin())], m, 9);
+  }
 
-  ret[15 + m] = ret[15 + m] >> 9 | ((ret[15 + m] >> 8) & INT64_C(1));
-  ret[25 + m] = ret[25 + m] >> 9 | ((ret[25 + m] >> 8) & INT64_C(1));
-#else
-  add2(ret, mp1[std::accumulate(t + 1, t + 9, t[0], [](int x, int y) { return 5 * x + y; })], m);
-#endif
-
-  return {static_cast<int>(ret[5 + m]), ret[15 + m], ret[25 + m]};
+  return {static_cast<int>(ret[m + 5]), ret[m + 15], ret[m + 25]};
 }
 
-std::tuple<int, int64_t, int64_t> CalshtDW::calc_sp(const int* t) const
+std::tuple<int, uint64_t, uint64_t> CalshtDW::calc_sp(const std::vector<int>& t,
+                                                      const bool three_player) const
 {
   int pair = 0;
   int kind = 0;
-  int64_t disc = INT64_C(0);
-  int64_t wait = INT64_C(0);
-  int64_t disc_ = INT64_C(0);
-  int64_t wait_ = INT64_C(0);
+  uint64_t disc = 0ul;  // 不要牌
+  uint64_t wait = 0ul;  // 有効牌
+  uint64_t disc_ = 0ul; // 不要牌候補
+  uint64_t wait_ = 0ul; // 有効牌候補
 
-  for (int i = 0; i < K; ++i) {
-#ifdef THREE_PLAYER
-    if (i > 0 && i < 8) continue;
-#endif
+  for (int i = 0; i < NUM_TIDS; ++i) {
+    if (three_player && i > 0 && i < 8) continue;
+
     if (t[i] == 0) {
-      wait_ |= INT64_C(1) << i;
+      wait_ |= 1ul << i;
     }
     else if (t[i] == 1) {
       ++kind;
-      disc_ |= INT64_C(1) << i;
-      wait |= INT64_C(1) << i;
+      disc_ |= 1ul << i;
+      wait |= 1ul << i;
     }
     else if (t[i] == 2) {
       ++kind;
@@ -169,49 +182,47 @@ std::tuple<int, int64_t, int64_t> CalshtDW::calc_sp(const int* t) const
     else if (t[i] > 2) {
       ++kind;
       ++pair;
-      disc |= INT64_C(1) << i;
+      disc |= 1ul << i;
     }
   }
 
   if (kind > 7) disc |= disc_;
   else if (kind < 7) wait |= wait_;
 
-  if (pair == 7) wait = INT64_C(0);
-
   return {7 - pair + (kind < 7 ? 7 - kind : 0), disc, wait};
 }
 
-std::tuple<int, int64_t, int64_t> CalshtDW::calc_to(const int* t) const
+std::tuple<int, uint64_t, uint64_t> CalshtDW::calc_to(const std::vector<int>& t) const
 {
   int pair = 0;
   int kind = 0;
-  int64_t disc = INT64_C(0);
-  int64_t wait = INT64_C(0);
-  int64_t disc_ = INT64_C(0);
-  int64_t wait_ = INT64_C(0);
+  uint64_t disc = 0ul;  // 不要牌
+  uint64_t wait = 0ul;  // 有効牌
+  uint64_t disc_ = 0ul; // 不要牌候補
+  uint64_t wait_ = 0ul; // 有効牌候補
 
   for (const int i : {0, 8, 9, 17, 18, 26, 27, 28, 29, 30, 31, 32, 33}) {
     if (t[i] == 0) {
-      wait |= INT64_C(1) << i;
+      wait |= 1ul << i;
     }
     else if (t[i] == 1) {
       ++kind;
-      wait_ |= INT64_C(1) << i;
+      wait_ |= 1ul << i;
     }
     else if (t[i] == 2) {
       ++kind;
       ++pair;
-      disc_ |= INT64_C(1) << i;
+      disc_ |= 1ul << i;
     }
     else if (t[i] > 2) {
       ++kind;
       ++pair;
-      disc |= INT64_C(1) << i;
+      disc |= 1ul << i;
     }
   }
 
   for (const int i : {1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25}) {
-    if (t[i] > 0) disc |= INT64_C(1) << i;
+    if (t[i] > 0) disc |= 1ul << i;
   }
 
   if (pair >= 2) disc |= disc_;
@@ -222,30 +233,44 @@ std::tuple<int, int64_t, int64_t> CalshtDW::calc_to(const int* t) const
 
 void CalshtDW::initialize(const std::string& dir)
 {
-  read_file(mp1.begin(), mp1.end(), std::filesystem::path(dir) / "index_dw_s.txt");
-  read_file(mp2.begin(), mp2.end(), std::filesystem::path(dir) / "index_dw_h.txt");
+  read_file(mp1.begin(), mp1.end(), std::filesystem::path(dir) / "index_dw_s.bin");
+  read_file(mp2.begin(), mp2.end(), std::filesystem::path(dir) / "index_dw_h.bin");
 }
 
-std::tuple<int, int, int64_t, int64_t> CalshtDW::operator()(const std::vector<int>& t, const int m, const int mode) const
+std::tuple<int, int, uint64_t, uint64_t> CalshtDW::operator()(const std::vector<int>& t,
+                                                              const int m,
+                                                              const int mode,
+                                                              const bool check_hand,
+                                                              const bool three_player) const
 {
-#ifdef CHECK_HAND
-  if (m < 0 || m > 4) {
-    throw std::runtime_error("Abnormal sum of hands's melds");
-  }
+  if (check_hand) {
+    int n = 0;
 
-  for (int i = 0; i < K; ++i) {
-    if (t[i] < 0 || t[i] > 4) {
-      std::stringstream ss;
-      ss << "Abnormal number of hand's tiles at " << i << ": " << t[i];
-      throw std::runtime_error(ss.str());
+    for (int i = 0; i < NUM_TIDS; ++i) {
+      if (t[i] < 0 || t[i] > 4) {
+        throw std::invalid_argument(std::format("Invalid number of hand's tiles at {}: {}", i, t[i]));
+      }
+
+      ++n;
+    }
+
+    if (ENABLE_NYANTEN && n > 14) {
+      throw std::invalid_argument(std::format("Invalid sum of hand's tiles: {}", n));
+    }
+
+    if (m < 0 || m > 4) {
+      throw std::invalid_argument(std::format("Invalid sum of hands's melds: {}", m));
+    }
+
+    if (mode < 0 || mode > 7) {
+      throw std::invalid_argument(std::format("Invalid caluculation mode: {}", mode));
     }
   }
-#endif
 
-  std::tuple<int, int, int64_t, int64_t> ret{1024, 0, 0, 0};
+  std::tuple<int, int, uint64_t, uint64_t> ret{1024, 0, 0, 0};
 
   if (mode & 1) {
-    if (auto [sht, disc, wait] = calc_lh(t.data(), m); sht < std::get<0>(ret)) {
+    if (auto [sht, disc, wait] = calc_lh(t, m, three_player); sht < std::get<0>(ret)) {
       ret = {sht, 1, disc, wait};
     }
     else if (sht == std::get<0>(ret)) {
@@ -256,7 +281,7 @@ std::tuple<int, int, int64_t, int64_t> CalshtDW::operator()(const std::vector<in
   }
 
   if ((mode & 2) && m == 4) {
-    if (auto [sht, disc, wait] = calc_sp(t.data()); sht < std::get<0>(ret)) {
+    if (auto [sht, disc, wait] = calc_sp(t, three_player); sht < std::get<0>(ret)) {
       ret = {sht, 2, disc, wait};
     }
     else if (sht == std::get<0>(ret)) {
@@ -267,7 +292,7 @@ std::tuple<int, int, int64_t, int64_t> CalshtDW::operator()(const std::vector<in
   }
 
   if ((mode & 4) && m == 4) {
-    if (auto [sht, disc, wait] = calc_to(t.data()); sht < std::get<0>(ret)) {
+    if (auto [sht, disc, wait] = calc_to(t); sht < std::get<0>(ret)) {
       ret = {sht, 4, disc, wait};
     }
     else if (sht == std::get<0>(ret)) {

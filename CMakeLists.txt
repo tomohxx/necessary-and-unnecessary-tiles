@@ -11,7 +11,7 @@ option(ENABLE_NYANTEN "ENABLE_NYANTEN" off)
 option(ENABLE_PARALLEL "ENABLE_PARALLEL" off)
 option(FIX_RANDOM_SEED "FIX_RANDOM_SEED" off)
 
-add_library(calsht_dw STATIC src/calsht_dw.cpp)
+add_library(calsht_dw src/calsht_dw.cpp)
 if(ENABLE_NYANTEN)
   target_compile_definitions(calsht_dw PUBLIC ENABLE_NYANTEN=true)
 endif()

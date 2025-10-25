@@ -21,19 +21,19 @@ private:
   void add1(LVec& lhs, const RVec& rhs, int m, int w) const;
   void add2(LVec& lhs, const RVec& rhs, int m, int w) const;
   void read_file(Iter first, Iter last, std::filesystem::path file) const;
-  std::tuple<int, uint64_t, uint64_t> calc_lh(const std::vector<int>& t,
+  std::tuple<int, uint64_t, uint64_t> calc_lh(const std::array<int, 34>& t,
                                               int m,
                                               const bool three_player = false) const;
-  std::tuple<int, uint64_t, uint64_t> calc_sp(const std::vector<int>& t,
+  std::tuple<int, uint64_t, uint64_t> calc_sp(const std::array<int, 34>& t,
                                               bool three_player = false) const;
-  std::tuple<int, uint64_t, uint64_t> calc_to(const std::vector<int>& t) const;
+  std::tuple<int, uint64_t, uint64_t> calc_to(const std::array<int, 34>& t) const;
 
 public:
   CalshtDW()
       : mp1(ENABLE_NYANTEN ? 405350 : 1953125, RVec(30)),
         mp2(ENABLE_NYANTEN ? 43130 : 78125, RVec(30)) {}
   void initialize(const std::string& dir);
-  std::tuple<int, int, uint64_t, uint64_t> operator()(const std::vector<int>& t,
+  std::tuple<int, int, uint64_t, uint64_t> operator()(const std::array<int, 34>& t,
                                                       int m,
                                                       int mode,
                                                       bool check_hand = false,

@@ -61,7 +61,7 @@ $ ./mkind
 
 ## 使用方法
 
-1. 手牌を表す`std::vector<int>`配列を用意します.
+1. 手牌を表す`std::array<int, 34>`配列を用意します.
    - `n`番目の要素が`n`番目の牌の枚数を格納します.
 
    |        | 1       | 2       | 3       | 4       | 5       | 6       | 7       | 8       | 9       |
@@ -74,7 +74,7 @@ $ ./mkind
    - 例えば123m245779p13555zのような手牌の場合, 以下の配列を定義します.
 
    ```cpp
-   std::vector<int> hand = {
+   std::array<int, 34> hand = {
        1, 1, 1, 0, 0, 0, 0, 0, 0, // Manzu
        0, 1, 0, 1, 1, 0, 2, 0, 1, // Pinzu
        0, 0, 0, 0, 0, 0, 0, 0, 0, // Souzu
@@ -84,7 +84,7 @@ $ ./mkind
 
 1. シャンテン数と有効牌・不要牌を計算します.
     ```cpp
-    std::tuple<int, int, uint64_t, uint64_t> CalshtDW::operator()(const std::vector<int>& t,
+    std::tuple<int, int, uint64_t, uint64_t> CalshtDW::operator()(const std::array<int, 34>& t,
                                                                   int m,
                                                                   int mode,
                                                                   bool check_hand = false,
@@ -103,10 +103,10 @@ $ ./mkind
 
     ```cpp
     #include "calsht_dw.hpp"
+    #include <array>
     #include <bitset>
     #include <filesystem>
     #include <iostream>
-    #include <vector>
 
     int main()
     {
@@ -115,7 +115,7 @@ $ ./mkind
       // Set the location of shanten tables
       calsht.initialize(std::filesystem::current_path());
 
-      std::vector<int> hand = {
+      std::array<int, 34> hand = {
           1, 1, 1, 0, 0, 0, 0, 0, 0, // manzu
           0, 1, 0, 1, 1, 0, 2, 0, 1, // pinzu
           0, 0, 0, 0, 0, 0, 0, 0, 0, // souzu

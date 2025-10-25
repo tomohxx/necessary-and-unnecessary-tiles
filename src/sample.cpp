@@ -28,8 +28,8 @@ int main(int argc, char* argv[])
   constexpr int MODE = 7;
   const int NUM_ROUNDS = std::atoi(argv[1]);
   const bool THREE_PLAYER = std::atoi(argv[2]);
-  std::vector<int> hand(NUM_TIDS, 0);
-  std::vector<int> wall34(NUM_TIDS, 0);
+  std::array<int, NUM_TIDS> hand{};
+  std::array<int, NUM_TIDS> wall34{};
   std::vector<int> wall136;
   std::array<int, NUM_TIDS> cnt{};
   std::array<std::array<int, MAX_SHT>, NUM_TURNS> table{};

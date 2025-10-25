@@ -63,7 +63,7 @@ $ ./mkind
 
 ## Usage
 
-1. Prepare a `std::vector<int>` array representing a hand.
+1. Prepare a `std::array<int, 34>` array representing a hand.
    - The `n` th element stores the number of `n` th tiles.
 
    |         | 1           | 2            | 3           | 4            | 5            | 6            | 7          | 8       | 9       |
@@ -76,7 +76,7 @@ $ ./mkind
    - For example, if you have *manzu* tiles (1, 2, 3), *pinzu* tiles (2, 4, 5, 7, 7, 9), and *jihai* tiles (*East*, *West*, *White*, *White*, *White*), define the following array.
 
    ```cpp
-   std::vector<int> hand = {
+   std::array<int, 34> hand = {
        1, 1, 1, 0, 0, 0, 0, 0, 0, // Manzu
        0, 1, 0, 1, 1, 0, 2, 0, 1, // Pinzu
        0, 0, 0, 0, 0, 0, 0, 0, 0, // Souzu
@@ -86,7 +86,7 @@ $ ./mkind
 
 1. Calculate the shanten number, necessary tiles and the unnecessary tiles.
     ```cpp
-    std::tuple<int, int, uint64_t, uint64_t> CalshtDW::operator()(const std::vector<int>& t,
+    std::tuple<int, int, uint64_t, uint64_t> CalshtDW::operator()(const std::array<int, 34>& t,
                                                                   int m,
                                                                   int mode,
                                                                   bool check_hand = false,
@@ -105,10 +105,10 @@ $ ./mkind
 
     ```cpp
     #include "calsht_dw.hpp"
+    #include <array>
     #include <bitset>
     #include <filesystem>
     #include <iostream>
-    #include <vector>
 
     int main()
     {
@@ -117,7 +117,7 @@ $ ./mkind
       // Set the location of shanten tables
       calsht.initialize(std::filesystem::current_path());
 
-      std::vector<int> hand = {
+      std::array<int, 34> hand = {
           1, 1, 1, 0, 0, 0, 0, 0, 0, // manzu
           0, 1, 0, 1, 1, 0, 2, 0, 1, // pinzu
           0, 0, 0, 0, 0, 0, 0, 0, 0, // souzu

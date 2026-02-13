@@ -2,14 +2,10 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
-#include <filesystem>
 #include <format>
 #include <iostream>
 #include <random>
 #include <utility>
-#ifndef INDEX_FILE_PATH
-#define INDEX_FILE_PATH std::filesystem::current_path()
-#endif
 #ifndef FIX_RANDOM_SEED
 #define SEED (std::random_device{}())
 #else

@@ -57,12 +57,12 @@ int main(int argc, char* argv[])
 
     for (int j = 0; j < NUM_TILES; ++j) {
       ++hand[wall136[j]];
-      --wall34[j];
+      --wall34[wall136[j]];
     }
 
     for (int j = 0; j < NUM_TURNS; ++j) {
       ++hand[wall136[j + NUM_TILES]];
-      --wall34[j + NUM_TILES];
+      --wall34[wall136[j + NUM_TILES]];
 
       const auto [sht, mode, disc, wait] = calsht(hand,
                                                   NUM_TILES / 3,

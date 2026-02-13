@@ -251,7 +251,7 @@ std::tuple<int, int, uint64_t, uint64_t> CalshtDW::operator()(const std::array<i
         throw std::invalid_argument(std::format("Invalid number of hand's tiles at {}: {}", i, t[i]));
       }
 
-      ++n;
+      n += t[i];
     }
 
     if (ENABLE_NYANTEN && n > 14) {

@@ -10,6 +10,11 @@
 #else
 #define NUM_TILE (4)
 #endif
+#ifdef ENABLE_PARALLEL
+#define POLICY (std::execution::par)
+#else
+#define POLICY (std::execution::seq)
+#endif
 constexpr int MAX_TILES = 14;
 constexpr int MAX_SHT = 14;
 constexpr int NUM_MELDS = 4;
@@ -161,7 +166,7 @@ int main()
 
     std::vector<std::vector<uint32_t>> dists(hands.size(), std::vector<uint32_t>(30, 0));
 
-    std::for_each(std::execution::par, hands.begin(), hands.end(),
+    std::for_each(POLICY, hands.begin(), hands.end(),
                   [&melds, &dists](const auto& hand_hash) {
                     Hand target(9);
                     auto& dist = dists[hand_hash.second];
@@ -203,7 +208,7 @@ int main()
 
     std::vector<std::vector<uint32_t>> dists(hands.size(), std::vector<uint32_t>(30, 0));
 
-    std::for_each(std::execution::par, hands.begin(), hands.end(),
+    std::for_each(POLICY, hands.begin(), hands.end(),
                   [&melds, &dists](const auto& hand_hash) {
                     Hand target(7);
                     auto& dist = dists[hand_hash.second];

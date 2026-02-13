@@ -11,7 +11,9 @@
 #define INDEX_FILE_PATH std::filesystem::current_path()
 #endif
 #ifndef FIX_RANDOM_SEED
-#define FIX_RANDOM_SEED false
+#define SEED (std::random_device{}())
+#else
+#define SEED (0)
 #endif
 
 int main(int argc, char* argv[])
@@ -33,10 +35,7 @@ int main(int argc, char* argv[])
   std::vector<int> wall136;
   std::array<int, NUM_TIDS> cnt{};
   std::array<std::array<int, MAX_SHT>, NUM_TURNS> table{};
-  std::conditional<FIX_RANDOM_SEED,
-                   std::integral_constant<int, 0>,
-                   std::random_device>::type seed_gen;
-  std::mt19937_64 rand(seed_gen());
+  std::mt19937_64 rand(SEED);
   CalshtDW calsht;
 
   calsht.initialize(INDEX_FILE_PATH);

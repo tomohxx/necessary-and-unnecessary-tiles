@@ -32,9 +32,8 @@ int main(int argc, char* argv[])
   std::array<int, NUM_TIDS> cnt{};
   std::array<std::array<int, MAX_SHT>, NUM_TURNS> table{};
   std::mt19937_64 rand(SEED);
-  CalshtDW calsht;
+  CalshtDW calsht(INDEX_FILE_PATH);
 
-  calsht.initialize(INDEX_FILE_PATH);
   wall136.reserve(NUM_TIDS * 4);
 
   for (int i = 0; i < NUM_TIDS; ++i) {

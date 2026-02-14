@@ -7,9 +7,6 @@
 #include <string>
 #include <tuple>
 #include <vector>
-#ifndef ENABLE_NYANTEN
-#define ENABLE_NYANTEN (false)
-#endif
 
 class CalshtDW {
 private:
@@ -31,10 +28,7 @@ private:
   std::tuple<int, uint64_t, uint64_t> calc_to(const std::array<int, 34>& t) const;
 
 public:
-  CalshtDW()
-      : mp1(ENABLE_NYANTEN ? 405350 : 1953125),
-        mp2(ENABLE_NYANTEN ? 43130 : 78125) {}
-  void initialize(const std::string& dir);
+  CalshtDW(const std::string& dir);
   std::tuple<int, int, uint64_t, uint64_t> operator()(const std::array<int, 34>& t,
                                                       int m,
                                                       int mode,

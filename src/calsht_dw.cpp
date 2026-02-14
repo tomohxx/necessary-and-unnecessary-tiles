@@ -218,7 +218,12 @@ std::tuple<int, uint64_t, uint64_t> CalshtDW::calc_to(const std::array<int, NUM_
   return {14 - kind - (pair > 0 ? 1 : 0), disc, wait};
 }
 
-void CalshtDW::initialize(const std::string& dir)
+CalshtDW::CalshtDW(const std::string& dir)
+#ifndef ENABLE_NYANTEN
+    : mp1(1953125), mp2(78125)
+#else
+    : mp1(405350), mp2(43130)
+#endif
 {
   read_file(mp1.begin(), mp1.end(), std::filesystem::path(dir) / "index_dw_s.bin");
   read_file(mp2.begin(), mp2.end(), std::filesystem::path(dir) / "index_dw_h.bin");
@@ -241,9 +246,11 @@ std::tuple<int, int, uint64_t, uint64_t> CalshtDW::operator()(const std::array<i
       n += t[i];
     }
 
-    if (ENABLE_NYANTEN && n > 14) {
+#ifdef ENABLE_NYANTEN
+    if (n > 14) {
       throw std::invalid_argument(std::format("Invalid sum of hand's tiles: {}", n));
     }
+#endif
 
     if (m < 0 || m > 4) {
       throw std::invalid_argument(std::format("Invalid sum of hands's melds: {}", m));

@@ -21,7 +21,7 @@ target_include_directories(calsht_dw PUBLIC
 target_compile_definitions(calsht_dw INTERFACE
   $<BUILD_INTERFACE:INDEX_FILE_PATH="${PROJECT_BINARY_DIR}">
   $<INSTALL_INTERFACE:INDEX_FILE_PATH="${CMAKE_INSTALL_PREFIX}/share/data">
-  $<$<BOOL:${ENABLE_NYANTEN}>:ENABLE_NYANTEN>)
+  PUBLIC $<$<BOOL:${ENABLE_NYANTEN}>:ENABLE_NYANTEN>)
 set_target_properties(calsht_dw PROPERTIES PUBLIC_HEADER src/calsht_dw.hpp)
 install(TARGETS calsht_dw compile_settings EXPORT CalshtDW)
 install(FILES

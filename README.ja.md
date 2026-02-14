@@ -106,10 +106,8 @@ $ ./mkind
 
     int main()
     {
-      CalshtDW calsht;
-
       // Set the location of shanten tables
-      calsht.initialize(std::filesystem::current_path());
+      CalshtDW calsht(std::filesystem::current_path());
 
       std::array<int, 34> hand = {
           1, 1, 1, 0, 0, 0, 0, 0, 0, // manzu

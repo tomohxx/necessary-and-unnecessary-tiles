@@ -9,6 +9,14 @@ constexpr int NUM_TIDS = 34;
 const Hash<9> hash1;
 const Hash<7> hash2;
 
+constexpr std::array<std::array<uint32_t, 30>, 5> index1 = {{
+    {0u, 3u, 14u, 14u, 14u, 2u, 14u, 14u, 14u, 14u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 1u, 0u, 0u, 0u, 1u, 0u, 0u, 0u, 0u},
+    {0u, 2u, 14u, 14u, 14u, 1u, 14u, 14u, 14u, 14u, 1u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 1u, 0u, 0u, 0u, 1u, 0u, 0u, 0u, 0u},
+    {0u, 1u, 14u, 14u, 14u, 0u, 14u, 14u, 14u, 14u, 1u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 1u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u},
+    {0u, 0u, 14u, 14u, 14u, 0u, 14u, 14u, 14u, 14u, 1u, 0u, 0u, 0u, 0u, 1u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u},
+    {0u, 0u, 14u, 14u, 14u, 0u, 14u, 14u, 14u, 14u, 1u, 1u, 0u, 0u, 0u, 1u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u},
+}};
+
 void shift(uint64_t& lv, const uint64_t rv,
            uint64_t& lx, const uint64_t rx,
            uint64_t& ly, const uint64_t ry)
@@ -22,27 +30,6 @@ void shift(uint64_t& lv, const uint64_t rv,
     lx = rx;
     ly = ry;
   }
-}
-
-CalshtDW::RArr CalshtDW::index1(const int n) const
-{
-  RArr ret{};
-
-  std::fill_n(ret.begin(), 10, 14u);
-
-  ret[0] = 0u;
-  ret[1] = std::max(3u - n, 0u);
-  ret[5] = std::max(2u - n, 0u);
-
-  ret[10] = (n > 0 ? 1u : 0u);
-  ret[11] = (n > 3 ? 1u : 0u);
-  ret[15] = (n > 2 ? 1u : 0u);
-
-  ret[20] = 0u;
-  ret[21] = (n < 3 ? 1u : 0u);
-  ret[25] = (n < 2 ? 1u : 0u);
-
-  return ret;
 }
 
 void CalshtDW::add1(LArr& lhs, const RArr& rhs, const int m, const int w) const
@@ -144,8 +131,8 @@ std::tuple<int, uint64_t, uint64_t> CalshtDW::calc_lh(const std::array<int, NUM_
   add1(ret, mp1[hash1(t.cbegin() + 9)], m, 9);
 
   if (three_player) {
-    add1(ret, index1(t[8]), m, 1);
-    add2(ret, index1(t[0]), m, 8);
+    add1(ret, index1[t[8]], m, 1);
+    add2(ret, index1[t[0]], m, 8);
   }
   else {
     add2(ret, mp1[hash1(t.cbegin())], m, 9);

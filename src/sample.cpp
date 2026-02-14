@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cstdlib>
 #include <format>
 #include <iostream>
 #include <random>

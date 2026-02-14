@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <format>
 #include <fstream>
+#include <ranges>
 #include <stdexcept>
 constexpr int NUM_TIDS = 34;
 const Hash<9> hash1;
@@ -23,9 +24,9 @@ void shift(uint64_t& lv, const uint64_t rv,
   }
 }
 
-CalshtDW::RVec CalshtDW::index1(const int n) const
+CalshtDW::RArr CalshtDW::index1(const int n) const
 {
-  RVec ret(30, 0u);
+  RArr ret{};
 
   std::fill_n(ret.begin(), 10, 14u);
 
@@ -44,7 +45,7 @@ CalshtDW::RVec CalshtDW::index1(const int n) const
   return ret;
 }
 
-void CalshtDW::add1(LVec& lhs, const RVec& rhs, const int m, const int w) const
+void CalshtDW::add1(LArr& lhs, const RArr& rhs, const int m, const int w) const
 {
   for (int j = m + 5; j >= 5; --j) {
     uint64_t sht = lhs[j] + rhs[0];
@@ -86,7 +87,7 @@ void CalshtDW::add1(LVec& lhs, const RVec& rhs, const int m, const int w) const
   }
 }
 
-void CalshtDW::add2(LVec& lhs, const RVec& rhs, const int m, const int w) const
+void CalshtDW::add2(LArr& lhs, const RArr& rhs, const int m, const int w) const
 {
   const int j = m + 5;
   uint64_t sht = lhs[j] + rhs[0];
@@ -121,9 +122,9 @@ void CalshtDW::read_file(Iter first, Iter last, std::filesystem::path file) cons
 
   for (; first != last; ++first) {
     for (int j = 0; j < 10; ++j) {
-      RVec::value_type tmp;
+      RArr::value_type tmp;
 
-      fin.read(reinterpret_cast<char*>(&tmp), sizeof(RVec::value_type));
+      fin.read(reinterpret_cast<char*>(&tmp), sizeof(RArr::value_type));
       (*first)[j] = tmp & 0xF;
       (*first)[j + 10] = (tmp >> 4) & 0x1FF;
       (*first)[j + 20] = (tmp >> 13) & 0x1FF;
@@ -135,9 +136,9 @@ std::tuple<int, uint64_t, uint64_t> CalshtDW::calc_lh(const std::array<int, NUM_
                                                       const int m,
                                                       const bool three_player) const
 {
-  LVec ret = [](const RVec& rhs) {
-    return LVec(rhs.cbegin(), rhs.cend());
-  }(mp2[hash2(t.cbegin() + 27)]);
+  LArr ret{};
+
+  std::ranges::copy(mp2[hash2(t.cbegin() + 27)], ret.begin());
 
   add1(ret, mp1[hash1(t.cbegin() + 18)], m, 9);
   add1(ret, mp1[hash1(t.cbegin() + 9)], m, 9);

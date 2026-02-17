@@ -34,7 +34,8 @@ $ cd build
 $ cmake .. -DCMAKE_BUILD_TYPE=Release
 $ make
 ```
-> **NOTE:** A compiler compatiable with C++20 or higher is needed.
+> [!NOTE]
+> A compiler compatiable with C++20 or higher is needed.
 
 ### Compile options
 
@@ -89,13 +90,17 @@ $ ./mkind
                                                                   bool three_player = false) const
     ```
 
-    > **NOTE:** Normally, substitute the value obtained by dividing the number of tiles by 3 into `m`.
+    > [!NOTE]
+    > Normally, substitute the value obtained by dividing the number of tiles by 3 into `m`.
 
-    > **NOTE:** `mode` specifies for which winning pattern calculate shanten number. When the pattern is "General Form", `mode` is 1, when "Seven Pairs": 2, "Thirteen Orphans": 4. When calculating the Shanten number for multiple winning patterns, specify the logical sum of them.
+    > [!NOTE]
+    > `mode` specifies for which winning pattern calculate shanten number. When the pattern is "General Form", `mode` is 1, when "Seven Pairs": 2, "Thirteen Orphans": 4. When calculating the Shanten number for multiple winning patterns, specify the logical sum of them.
 
-    > **NOTE:** This method returns the value of shunten number + 1, mode, necessary tiles, unnecessary tiles. The mode indicates which winning pattern (General Form, Seven Pairs, Thirteen Orphans) has the minimum shunten number. Each valid/unnecessary tile is represented by a 64-bit integer. Whether 1 or 0 of the `i`-th bit indicates whether the `i`-th tile is a necessary tile (or an unnecessary tile) or not.
+    > [!NOTE]
+    > This method returns the value of shunten number + 1, mode, necessary tiles, unnecessary tiles. The mode indicates which winning pattern (General Form, Seven Pairs, Thirteen Orphans) has the minimum shunten number. Each valid/unnecessary tile is represented by a 64-bit integer. Whether 1 or 0 of the `i`-th bit indicates whether the `i`-th tile is a necessary tile (or an unnecessary tile) or not.
 
-    > **NOTE:** If you set `check_hand` to `true`, the hand will be validated. If you set `three_player` to `true`, it will calculate the number of shanten in three-player mahjong.
+    > [!NOTE]
+    > If you set `check_hand` to `true`, the hand will be validated. If you set `three_player` to `true`, it will calculate the number of shanten in three-player mahjong.
 
     For example, calculate the necessary tiles and unneccessary tiles of the hand defined above. It requires one of *manzu* tiles (1 to 9) or one of *jihai* tiles (*East*, *West*) for winning, however one of *manzu* tiles (2, 4, 5, 7, 9) or one of  *jihai* tiles (*East*, *West*, *White*) is uneeded. The source code is as follows:
 

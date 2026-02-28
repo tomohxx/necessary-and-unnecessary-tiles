@@ -64,32 +64,32 @@ $ ./mkind
 1. 手牌を表す`std::array<int, 34>`配列を用意します.
    - `n`番目の要素が`n`番目の牌の枚数を格納します.
 
-   |        | 1       | 2       | 3       | 4       | 5       | 6       | 7       | 8       | 9       |
-   | :----- | :------ | :------ | :------ | :------ | :------ | :------ | :------ | :------ | :------ |
-   | マンズ | 0 (1m)  | 1 (2m)  | 2 (3m)  | 3 (4m)  | 4 (5m)  | 5 (6m)  | 6 (7m)  | 7 (8m)  | 8 (9m)  |
-   | ピンズ | 9 (1p)  | 10 (2p) | 11 (3p) | 12 (4p) | 13 (5p) | 14 (6p) | 15 (7p) | 16 (8p) | 17 (9p) |
-   | ソーズ | 18 (1s) | 19 (2s) | 20 (3s) | 21 (4s) | 22 (5s) | 23 (6s) | 24 (7s) | 25 (8s) | 26 (9s) |
-   | 字牌   | 27 (東) | 28 (南) | 29 (西) | 30 (北) | 31 (白) | 32 (発) | 33 (中) |         |         |
+      |        | 1       | 2       | 3       | 4       | 5       | 6       | 7       | 8       | 9       |
+      | :----- | :------ | :------ | :------ | :------ | :------ | :------ | :------ | :------ | :------ |
+      | マンズ | 0 (1m)  | 1 (2m)  | 2 (3m)  | 3 (4m)  | 4 (5m)  | 5 (6m)  | 6 (7m)  | 7 (8m)  | 8 (9m)  |
+      | ピンズ | 9 (1p)  | 10 (2p) | 11 (3p) | 12 (4p) | 13 (5p) | 14 (6p) | 15 (7p) | 16 (8p) | 17 (9p) |
+      | ソーズ | 18 (1s) | 19 (2s) | 20 (3s) | 21 (4s) | 22 (5s) | 23 (6s) | 24 (7s) | 25 (8s) | 26 (9s) |
+      | 字牌   | 27 (東) | 28 (南) | 29 (西) | 30 (北) | 31 (白) | 32 (発) | 33 (中) |         |         |
 
    - 例えば123m245779p13555zのような手牌の場合, 以下の配列を定義します.
 
-   ```cpp
-   std::array<int, 34> hand = {
-       1, 1, 1, 0, 0, 0, 0, 0, 0, // Manzu
-       0, 1, 0, 1, 1, 0, 2, 0, 1, // Pinzu
-       0, 0, 0, 0, 0, 0, 0, 0, 0, // Souzu
-       1, 0, 1, 0, 3, 0, 0        // Jihai
-   };
-   ```
+      ```cpp
+      std::array<int, 34> hand = {
+         1, 1, 1, 0, 0, 0, 0, 0, 0, // Manzu
+         0, 1, 0, 1, 1, 0, 2, 0, 1, // Pinzu
+         0, 0, 0, 0, 0, 0, 0, 0, 0, // Souzu
+         1, 0, 1, 0, 3, 0, 0        // Jihai
+      };
+      ```
 
 1. シャンテン数と有効牌・不要牌を計算します.
-    ```cpp
-    std::tuple<int, int, uint64_t, uint64_t> CalshtDW::operator()(const std::array<int, 34>& t,
-                                                                  int m,
-                                                                  int mode,
-                                                                  bool check_hand = false,
-                                                                  bool three_player = false) const
-    ```
+   ```cpp
+   std::tuple<int, int, uint64_t, uint64_t> CalshtDW::operator()(const std::array<int, 34>& t,
+                                                               int m,
+                                                               int mode,
+                                                               bool check_hand = false,
+                                                               bool three_player = false) const
+   ```
 
 > [!NOTE]
 > 通常, `m`には手牌の枚数を3で割った値を代入します.
@@ -103,44 +103,44 @@ $ ./mkind
 > [!NOTE]
 > `check_hand`を`true`にすると手牌のバリデーションを行います. `three_player`を`true`にすると三人麻雀での各値を計算します.
 
-    例として, 先に定義した手牌の有効牌と不要牌を計算します. この手牌の有効牌はピンズ(1から9)と東, 西で, 不要牌は東, 西, 白です. ソースコードは以下のようになります.
+例として, 先に定義した手牌の有効牌と不要牌を計算します. この手牌の有効牌はピンズ(1から9)と東, 西で, 不要牌は東, 西, 白です. ソースコードは以下のようになります.
 
-    ```cpp
-    #include "calsht_dw.hpp"
-    #include <array>
-    #include <bitset>
-    #include <filesystem>
-    #include <iostream>
+```cpp
+#include "calsht_dw.hpp"
+#include <array>
+#include <bitset>
+#include <filesystem>
+#include <iostream>
 
-    int main()
-    {
-      // Set the location of shanten tables
-      CalshtDW calsht(std::filesystem::current_path());
+int main()
+{
+// Set the location of shanten tables
+CalshtDW calsht(std::filesystem::current_path());
 
-      std::array<int, 34> hand = {
-          1, 1, 1, 0, 0, 0, 0, 0, 0, // manzu
-          0, 1, 0, 1, 1, 0, 2, 0, 1, // pinzu
-          0, 0, 0, 0, 0, 0, 0, 0, 0, // souzu
-          1, 0, 1, 0, 3, 0, 0        // jihai
-      };
+std::array<int, 34> hand = {
+      1, 1, 1, 0, 0, 0, 0, 0, 0, // manzu
+      0, 1, 0, 1, 1, 0, 2, 0, 1, // pinzu
+      0, 0, 0, 0, 0, 0, 0, 0, 0, // souzu
+      1, 0, 1, 0, 3, 0, 0        // jihai
+};
 
-      const auto [sht, mode, disc, wait] = calsht(hand, 4, 7);
+const auto [sht, mode, disc, wait] = calsht(hand, 4, 7);
 
-      std::cout << sht << std::endl;
-      std::cout << mode << std::endl;
-      std::cout << std::bitset<34>(disc) << std::endl;
-      std::cout << std::bitset<34>(wait) << std::endl;
+std::cout << sht << std::endl;
+std::cout << mode << std::endl;
+std::cout << std::bitset<34>(disc) << std::endl;
+std::cout << std::bitset<34>(wait) << std::endl;
 
-      return 0;
-    }
-    ```
-    出力:
-    ```
-    3
-    1
-    0010101000000000101011010000000000
-    0000101000000000111111111000000000
-    ```
+return 0;
+}
+```
+出力:
+```
+3
+1
+0010101000000000101011010000000000
+0000101000000000111111111000000000
+```
 
 ## サンプルプログラム
 

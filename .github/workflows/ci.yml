@@ -50,4 +50,3 @@ jobs:
         with:
           name: pre-calculated-distance-tables
           path: ${{github.workspace}}/build/index_dw_*.bin
-          archive: false

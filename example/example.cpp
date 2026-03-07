@@ -1,10 +1,10 @@
-#include "calsht_dw.hpp"
 #include <algorithm>
 #include <array>
 #include <cassert>
 #include <cstdlib>
 #include <format>
 #include <iostream>
+#include <mahjong/calsht_dw.hpp>
 #include <random>
 #include <utility>
 #ifndef FIX_RANDOM_SEED
@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
   std::array<int, NUM_TIDS> cnt{};
   std::array<std::array<int, MAX_SHT>, NUM_TURNS> table{};
   std::mt19937_64 rand(SEED);
-  CalshtDW calsht(INDEX_FILE_PATH);
+  mahjong::CalshtDW calsht(INDEX_FILE_PATH);
 
   wall136.reserve(NUM_TIDS * 4);
 

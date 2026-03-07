@@ -48,7 +48,7 @@ It enables the table search algorithm to use the minimal perfect hash function u
 
 #### `-DFIX_RANDOM_SEED`
 
-It fixes the random seed used in the sample program.
+It fixes the random seed used in the example program.
 
 #### Building tables
 
@@ -144,12 +144,12 @@ Output:
 0000101000000000111111111000000000
 ```
 
-## Sample Program
+## Example
 
 This program simultes single player mahjong. In each round, it discards one of unnecessary tiles, and then maximize the number of necessary tiles.
 
 ```
-$ ./sample 1000000 0
+$ ./example 1000000 0
 Number of Tiles         13
 Number of Rounds        1000000
 Turn    Shanten Number (-1 - 6) Hora    Tempai  Exp.

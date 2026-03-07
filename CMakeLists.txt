@@ -17,19 +17,22 @@ target_compile_options(compile_settings INTERFACE
 add_library(calsht_dw src/calsht_dw.cpp)
 target_link_libraries(calsht_dw compile_settings)
 target_include_directories(calsht_dw PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 target_compile_definitions(calsht_dw INTERFACE
   $<BUILD_INTERFACE:INDEX_FILE_PATH="${PROJECT_BINARY_DIR}">
   $<INSTALL_INTERFACE:INDEX_FILE_PATH="${CMAKE_INSTALL_PREFIX}/share/data">
   PUBLIC $<$<BOOL:${ENABLE_NYANTEN}>:ENABLE_NYANTEN>)
-set_target_properties(calsht_dw PROPERTIES PUBLIC_HEADER src/calsht_dw.hpp)
 install(TARGETS calsht_dw compile_settings EXPORT CalshtDW)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/mahjong DESTINATION include)
 install(FILES
   ${PROJECT_BINARY_DIR}/index_dw_s.bin
   ${PROJECT_BINARY_DIR}/index_dw_h.bin
-  DESTINATION share/data)
-install(EXPORT CalshtDW FILE CalshtDWConfig.cmake DESTINATION share/cmake)
+  DESTINATION share/data/mahjong)
+install(EXPORT CalshtDW
+  FILE CalshtDWConfig.cmake
+  NAMESPACE Mahjong::
+  DESTINATION share/cmake/mahjong)
 
 add_executable(mkind src/mkind.cpp)
 target_compile_definitions(mkind PRIVATE
@@ -37,6 +40,6 @@ target_compile_definitions(mkind PRIVATE
   $<$<BOOL:${TBB_FOUND}>:ENABLE_PARALLEL>)
 target_link_libraries(mkind compile_settings $<$<BOOL:${TBB_FOUND}>:TBB::tbb>)
 
-add_executable(sample src/sample.cpp)
-target_compile_definitions(sample PRIVATE $<$<BOOL:${FIX_RANDOM_SEED}>:FIX_RANDOM_SEED>)
-target_link_libraries(sample calsht_dw)
+add_executable(example example/example.cpp)
+target_compile_definitions(example PRIVATE $<$<BOOL:${FIX_RANDOM_SEED}>:FIX_RANDOM_SEED>)
+target_link_libraries(example calsht_dw)

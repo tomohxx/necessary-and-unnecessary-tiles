@@ -1,5 +1,5 @@
-#ifndef CALSHT_DW_HPP
-#define CALSHT_DW_HPP
+#ifndef MAHJONG_CALSHT_DW_HPP
+#define MAHJONG_CALSHT_DW_HPP
 
 #include <array>
 #include <cstdint>

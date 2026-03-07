@@ -21,7 +21,7 @@ target_include_directories(calsht_dw PUBLIC
   $<INSTALL_INTERFACE:include>)
 target_compile_definitions(calsht_dw INTERFACE
   $<BUILD_INTERFACE:INDEX_FILE_PATH="${PROJECT_BINARY_DIR}">
-  $<INSTALL_INTERFACE:INDEX_FILE_PATH="${CMAKE_INSTALL_PREFIX}/share/data">
+  $<INSTALL_INTERFACE:INDEX_FILE_PATH="${CMAKE_INSTALL_PREFIX}/share/data/mahjong">
   PUBLIC $<$<BOOL:${ENABLE_NYANTEN}>:ENABLE_NYANTEN>)
 install(TARGETS calsht_dw compile_settings EXPORT CalshtDW)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/mahjong DESTINATION include)

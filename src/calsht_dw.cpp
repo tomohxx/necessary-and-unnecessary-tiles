@@ -230,11 +230,11 @@ namespace mahjong {
     read_file(mp2.begin(), mp2.end(), std::filesystem::path(dir) / "index_dw_h.bin");
   }
 
-  std::tuple<int, int, uint64_t, uint64_t> CalshtDW::operator()(const std::array<int, 34>& t,
-                                                                const int m,
-                                                                const int mode,
-                                                                const bool check_hand,
-                                                                const bool three_player) const
+  std::tuple<int, unsigned int, uint64_t, uint64_t> CalshtDW::operator()(const std::array<int, 34>& t,
+                                                                         const int m,
+                                                                         const unsigned int mode,
+                                                                         const bool check_hand,
+                                                                         const bool three_player) const
   {
     if (check_hand) {
       int n = 0;
@@ -257,14 +257,14 @@ namespace mahjong {
         throw std::invalid_argument(std::format("Invalid sum of hands's melds: {}", m));
       }
 
-      if (mode < 0 || mode > 7) {
+      if (mode > 7u) {
         throw std::invalid_argument(std::format("Invalid caluculation mode: {}", mode));
       }
     }
 
-    std::tuple<int, int, uint64_t, uint64_t> ret{1024, 0, 0, 0};
+    std::tuple<int, int, uint64_t, uint64_t> ret{1024, 0u, 0u, 0u};
 
-    if (mode & 1) {
+    if (mode & 1u) {
       if (auto [sht, disc, wait] = calc_lh(t, m, three_player); sht < std::get<0>(ret)) {
         ret = {sht, 1, disc, wait};
       }
@@ -275,7 +275,7 @@ namespace mahjong {
       }
     }
 
-    if ((mode & 2) && m == 4) {
+    if ((mode & 2u) && m == 4) {
       if (auto [sht, disc, wait] = calc_sp(t, three_player); sht < std::get<0>(ret)) {
         ret = {sht, 2, disc, wait};
       }
@@ -286,7 +286,7 @@ namespace mahjong {
       }
     }
 
-    if ((mode & 4) && m == 4) {
+    if ((mode & 4u) && m == 4) {
       if (auto [sht, disc, wait] = calc_to(t); sht < std::get<0>(ret)) {
         ret = {sht, 4, disc, wait};
       }

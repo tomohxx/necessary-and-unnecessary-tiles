@@ -88,7 +88,7 @@ $ ./mkind
    ```cpp
    std::tuple<int, int, uint64_t, uint64_t> CalshtDW::operator()(const std::array<int, 34>& t,
                                                                int m,
-                                                               int mode,
+                                                               unsigned int mode,
                                                                bool check_hand = false,
                                                                bool three_player = false) const
    ```

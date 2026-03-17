@@ -84,11 +84,11 @@ $ ./mkind
 
 1. シャンテン数と有効牌・不要牌を計算します.
    ```cpp
-   std::tuple<int, int, uint64_t, uint64_t> CalshtDW::operator()(const std::array<int, 34>& t,
-                                                               int m,
-                                                               int mode,
-                                                               bool check_hand = false,
-                                                               bool three_player = false) const
+   std::tuple<int, unsigned int, uint64_t, uint64_t> CalshtDW::operator()(const std::array<int, 34>& t,
+                                                                          int m,
+                                                                          unsigned int mode,
+                                                                          bool check_hand = false,
+                                                                          bool three_player = false) const
    ```
 
 > [!NOTE]
@@ -142,12 +142,12 @@ return 0;
 0000101000000000111111111000000000
 ```
 
-## サンプルプログラム
+## 実行例
 
 一人麻雀シミュレーションを行います. 各巡目でシャンテン数を不変に保ち, 打牌後の有効牌の枚数が最大となるように打牌を行います.
 
 ```
-$ ./sample 1000000 0
+$ ./example 1000000 0
 Number of Tiles         13
 Number of Rounds        1000000
 Turn    Shanten Number (-1 - 6) Hora    Tempai  Exp.

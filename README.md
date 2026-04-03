@@ -108,32 +108,32 @@ $ ./mkind
 For example, calculate the necessary tiles and unneccessary tiles of the hand defined above. It requires one of *manzu* tiles (1 to 9) or one of *jihai* tiles (*East*, *West*) for winning, however one of *manzu* tiles (2, 4, 5, 7, 9) or one of  *jihai* tiles (*East*, *West*, *White*) is uneeded. The source code is as follows:
 
 ```cpp
-#include "calsht_dw.hpp"
 #include <array>
 #include <bitset>
 #include <filesystem>
 #include <iostream>
+#include <mahjong/calsht_dw.hpp>
 
 int main()
 {
-// Set the location of shanten tables
-CalshtDW calsht(std::filesystem::current_path());
+   // Set the location of shanten tables
+   mahjong::CalshtDW calsht(std::filesystem::current_path());
 
-std::array<int, 34> hand = {
-      1, 1, 1, 0, 0, 0, 0, 0, 0, // manzu
-      0, 1, 0, 1, 1, 0, 2, 0, 1, // pinzu
-      0, 0, 0, 0, 0, 0, 0, 0, 0, // souzu
-      1, 0, 1, 0, 3, 0, 0        // jihai
-};
+   std::array<int, 34> hand = {
+         1, 1, 1, 0, 0, 0, 0, 0, 0, // manzu
+         0, 1, 0, 1, 1, 0, 2, 0, 1, // pinzu
+         0, 0, 0, 0, 0, 0, 0, 0, 0, // souzu
+         1, 0, 1, 0, 3, 0, 0        // jihai
+   };
 
-const auto [sht, mode, disc, wait] = calsht(hand, 4, 7);
+   const auto [sht, mode, disc, wait] = calsht(hand, 4, 7);
 
-std::cout << sht << std::endl;
-std::cout << mode << std::endl;
-std::cout << std::bitset<34>(disc) << std::endl;
-std::cout << std::bitset<34>(wait) << std::endl;
+   std::cout << sht << std::endl;
+   std::cout << mode << std::endl;
+   std::cout << std::bitset<34>(disc) << std::endl;
+   std::cout << std::bitset<34>(wait) << std::endl;
 
-return 0;
+   return 0;
 }
 ```
 Output:

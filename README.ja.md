@@ -106,32 +106,32 @@ $ ./mkind
 例として, 先に定義した手牌の有効牌と不要牌を計算します. この手牌の有効牌はピンズ(1から9)と東, 西で, 不要牌は東, 西, 白です. ソースコードは以下のようになります.
 
 ```cpp
-#include "calsht_dw.hpp"
 #include <array>
 #include <bitset>
 #include <filesystem>
 #include <iostream>
+#include <mahjong/calsht_dw.hpp>
 
 int main()
 {
-// Set the location of shanten tables
-CalshtDW calsht(std::filesystem::current_path());
+   // Set the location of shanten tables
+   mahjong::CalshtDW calsht(std::filesystem::current_path());
 
-std::array<int, 34> hand = {
-      1, 1, 1, 0, 0, 0, 0, 0, 0, // manzu
-      0, 1, 0, 1, 1, 0, 2, 0, 1, // pinzu
-      0, 0, 0, 0, 0, 0, 0, 0, 0, // souzu
-      1, 0, 1, 0, 3, 0, 0        // jihai
-};
+   std::array<int, 34> hand = {
+         1, 1, 1, 0, 0, 0, 0, 0, 0, // manzu
+         0, 1, 0, 1, 1, 0, 2, 0, 1, // pinzu
+         0, 0, 0, 0, 0, 0, 0, 0, 0, // souzu
+         1, 0, 1, 0, 3, 0, 0        // jihai
+   };
 
-const auto [sht, mode, disc, wait] = calsht(hand, 4, 7);
+   const auto [sht, mode, disc, wait] = calsht(hand, 4, 7);
 
-std::cout << sht << std::endl;
-std::cout << mode << std::endl;
-std::cout << std::bitset<34>(disc) << std::endl;
-std::cout << std::bitset<34>(wait) << std::endl;
+   std::cout << sht << std::endl;
+   std::cout << mode << std::endl;
+   std::cout << std::bitset<34>(disc) << std::endl;
+   std::cout << std::bitset<34>(wait) << std::endl;
 
-return 0;
+   return 0;
 }
 ```
 出力:

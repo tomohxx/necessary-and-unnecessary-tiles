@@ -1,8 +1,9 @@
 #include <algorithm>
+#include <array>
+#include <cstdint>
 #include <execution>
 #include <fstream>
 #include <iostream>
-#include <numeric>
 #include <utility>
 #include <vector>
 #ifdef ENABLE_PARALLEL
@@ -10,119 +11,88 @@
 #else
 #define POLICY (std::execution::seq)
 #endif
-constexpr int MAX_TILES = 14;
 constexpr int MAX_SHT = 14;
-constexpr int NUM_MELDS = 4;
-using Hand = std::vector<int>;
-using Hands = std::vector<std::pair<Hand, unsigned int>>;
-using Meld = std::vector<int>;
-using Melds = std::vector<Meld>;
+constexpr int MAX_TILES = 14;
+template <int N>
+using Hand = std::array<int, N>;
+template <int N>
+using Hands = std::vector<std::pair<Hand<N>, std::size_t>>;
 
-inline bool is_valid_target(const Hand& hand)
+struct Delta {
+  int a;
+  int b;
+  int c;
+  int h;
+  int m;
+};
+
+struct Data {
+  uint32_t sht;
+  uint32_t disc;
+  uint32_t wait;
+
+  operator uint32_t() const { return sht | (disc << 4) | (wait << 13); }
+};
+
+void chmin(Data& x, const Data y)
 {
-  return std::all_of(hand.begin(), hand.end(), [](const int x) { return x <= 4; });
-}
-
-inline uint32_t calc_distance(const Hand& current, const Hand& target)
-{
-  return std::inner_product(
-      target.begin(),
-      target.end(),
-      current.begin(),
-      0,
-      std::plus<int>(),
-      [](const auto& x, const auto& y) { return std::max(x - y, 0); });
-}
-
-inline uint32_t calc_discarded(const Hand& current, const Hand& target)
-{
-  return std::inner_product(
-      target.rbegin(),
-      target.rend(),
-      current.rbegin(),
-      0u,
-      [](const unsigned x, const unsigned y) { return (x << 1) | y; },
-      [](const int x, const int y) { return x < y ? 1u : 0u; });
-}
-
-inline uint32_t calc_waited(const Hand& current, const Hand& target)
-{
-  return std::inner_product(
-      target.rbegin(),
-      target.rend(),
-      current.rbegin(),
-      0u,
-      [](const unsigned x, const unsigned y) { return (x << 1) | y; },
-      [](const int x, const int y) { return x > y ? 1u : 0u; });
-}
-
-inline void add_meld(Hand& target, const Meld& meld)
-{
-  std::for_each(meld.begin(), meld.end(), [&target](const int x) { ++target[x]; });
-}
-
-inline void remove_meld(Hand& target, const Meld& meld)
-{
-  std::for_each(meld.begin(), meld.end(), [&target](const int x) { --target[x]; });
-}
-
-void dfs(const Hand& current,
-         Hand& target,
-         const int m,
-         const int min_mid,
-         const Melds& melds,
-         std::vector<uint32_t>& sht)
-{
-  for (int tid = 0; tid < static_cast<int>(current.size()); ++tid) {
-    target[tid] += 2;
-
-    if (is_valid_target(target)) {
-      const auto distance = calc_distance(current, target);
-
-      if (const auto comp = distance <=> sht[m + 5]; comp < 0) {
-        sht[m + 5] = distance;
-        sht[m + 15] = calc_discarded(current, target);
-        sht[m + 25] = calc_waited(current, target);
-      }
-      else if (comp == 0) {
-        sht[m + 15] |= calc_discarded(current, target);
-        sht[m + 25] |= calc_waited(current, target);
-      }
-    }
-
-    target[tid] -= 2;
+  if (x.sht > y.sht) {
+    x.sht = y.sht;
+    x.disc = y.disc;
+    x.wait = y.wait;
   }
-
-  if (m >= NUM_MELDS) return;
-
-  for (std::size_t mid = min_mid; mid < melds.size(); ++mid) {
-    add_meld(target, melds[mid]);
-
-    if (is_valid_target(target)) {
-      const auto distance = calc_distance(current, target);
-
-      if (const auto comp = distance <=> sht[m + 1]; comp < 0) {
-        sht[m + 1] = distance;
-        sht[m + 11] = calc_discarded(current, target);
-        sht[m + 21] = calc_waited(current, target);
-      }
-      else if (comp == 0) {
-        sht[m + 11] |= calc_discarded(current, target);
-        sht[m + 21] |= calc_waited(current, target);
-      }
-
-      if (distance <= sht[NUM_MELDS + 5]) {
-        dfs(current, target, m + 1, mid, melds, sht);
-      }
-    }
-
-    remove_meld(target, melds[mid]);
+  else if (x.sht == y.sht) {
+    x.disc |= y.disc;
+    x.wait |= y.wait;
   }
 }
 
-void deal(const int n, const int m, Hand& hand, Hands& hands)
+template <int N>
+void dp(const Hand<N>& hand, const std::vector<Delta>& deltas, std::array<uint32_t, 10>& sht)
 {
-  if (n >= static_cast<int>(hand.size())) {
+  using std::array;
+
+  array<array<array<array<array<Data, 5>, 2>, 5>, 5>, N + 1> table;
+
+  std::fill(table[0][0][0][0].begin(), table[N][4][4][1].end(), Data{MAX_SHT, 0u, 0u});
+
+  table[0][0][0][0][0] = {0, 0u, 0u};
+
+  for (int n = 0; n < N; ++n) {
+    for (int a = 0; a <= 4; ++a) {
+      for (int b = 0; b <= 4; ++b) {
+        for (int h = 0; h <= 1; ++h) {
+          for (int m = 0; m <= 4; ++m) {
+            auto& tmp = table[n][a][b][h][m];
+
+            if (tmp.sht == MAX_SHT) continue;
+
+            for (const auto& delta : deltas) {
+              if (a + delta.a > 4 ||
+                  b + delta.b > 4 ||
+                  h + delta.h > 1 ||
+                  m + delta.m > 4) continue;
+
+              const auto d = a + delta.a - hand[n];
+
+              chmin(table[n + 1][b + delta.b][delta.c][h + delta.h][m + delta.m],
+                    {tmp.sht + std::max(d, 0),
+                     d < 0 ? (tmp.disc | 1u << n) : tmp.disc,
+                     d > 0 ? (tmp.wait | 1u << n) : tmp.wait});
+            }
+          }
+        }
+      }
+    }
+  }
+
+  std::copy(table[N][0][0][0].cbegin(), table[N][0][0][1].cend(), sht.begin());
+}
+
+template <int N>
+void deal(const int n, const int m, Hand<N>& hand, Hands<N>& hands)
+{
+  if (n >= N) {
     hands.push_back(std::make_pair(hand, hands.size()));
   }
   else {
@@ -132,7 +102,7 @@ void deal(const int n, const int m, Hand& hand, Hands& hands)
     for (int i = 0; i <= 4; ++i) {
 #endif
       hand[n] = i;
-      deal(n + 1, m - i, hand, hands);
+      deal<N>(n + 1, m - i, hand, hands);
     }
   }
 }
@@ -147,41 +117,34 @@ int main()
       return 1;
     }
 
-    Hand hand(9);
-    Melds melds;
-    Hands hands;
+    Hand<9> hand{};
+    Hands<9> hands;
 
     hands.reserve(1953125); // 5^9
 
-    for (int tid = 0; tid < static_cast<int>(hand.size()); ++tid) {
-      melds.emplace_back(Meld{tid, tid, tid});
-    }
+    const std::vector<Delta> deltas = {
+        {0, 0, 0, 0, 0},
+        {1, 1, 1, 0, 1},
+        {2, 2, 2, 0, 2},
+        {3, 0, 0, 0, 1},
+        {4, 1, 1, 0, 2},
+        {2, 0, 0, 1, 0},
+        {3, 1, 1, 1, 1},
+        {4, 2, 2, 1, 2},
+    };
 
-    for (int tid = 0; tid < static_cast<int>(hand.size()) - 2; ++tid) {
-      melds.emplace_back(Meld{tid, tid + 1, tid + 2});
-    }
+    deal<9>(0, MAX_TILES, hand, hands);
 
-    deal(0, MAX_TILES, hand, hands);
-
-    std::vector<std::vector<uint32_t>> dists(hands.size(), std::vector<uint32_t>(30, 0));
+    std::vector<std::array<uint32_t, 10>> dists(hands.size(), std::array<uint32_t, 10>{});
 
     std::for_each(POLICY, hands.begin(), hands.end(),
-                  [&melds, &dists](const auto& hand_hash) {
-                    Hand target(9);
-                    auto& dist = dists[hand_hash.second];
-
-                    std::fill_n(dist.begin() + 1, 9, MAX_SHT);
-                    dist[10] = calc_discarded(hand_hash.first, target);
-                    dfs(hand_hash.first, target, 0, 0, melds, dist);
+                  [&deltas, &dists](const auto& hand_hash) {
+                    dp<9>(hand_hash.first, deltas, dists[hand_hash.second]);
                   });
 
     std::for_each(dists.begin(), dists.end(),
                   [&fout](const auto& dist) {
-                    for (int i = 0; i < 10; ++i) {
-                      const uint32_t tmp = dist[i] | (dist[i + 10] << 4) | (dist[i + 20] << 13);
-
-                      fout.write(reinterpret_cast<const char*>(&tmp), sizeof(uint32_t));
-                    }
+                    fout.write(reinterpret_cast<const char*>(dist.data()), dist.size() * sizeof(uint32_t));
                   });
   }
 
@@ -193,37 +156,29 @@ int main()
       return 1;
     }
 
-    Hand hand(7);
-    Melds melds;
-    Hands hands;
+    Hand<7> hand{};
+    Hands<7> hands;
 
     hands.reserve(78125); // 5^7
 
-    for (int tid = 0; tid < static_cast<int>(hand.size()); ++tid) {
-      melds.emplace_back(Meld{tid, tid, tid});
-    }
+    const std::vector<Delta> deltas = {
+        {0, 0, 0, 0, 0},
+        {3, 0, 0, 0, 1},
+        {2, 0, 0, 1, 0},
+    };
 
-    deal(0, MAX_TILES, hand, hands);
+    deal<7>(0, MAX_TILES, hand, hands);
 
-    std::vector<std::vector<uint32_t>> dists(hands.size(), std::vector<uint32_t>(30, 0));
+    std::vector<std::array<uint32_t, 10>> dists(hands.size(), std::array<uint32_t, 10>{});
 
     std::for_each(POLICY, hands.begin(), hands.end(),
-                  [&melds, &dists](const auto& hand_hash) {
-                    Hand target(7);
-                    auto& dist = dists[hand_hash.second];
-
-                    std::fill_n(dist.begin() + 1, 9, MAX_SHT);
-                    dist[10] = calc_discarded(hand_hash.first, target);
-                    dfs(hand_hash.first, target, 0, 0, melds, dist);
+                  [&deltas, &dists](const auto& hand_hash) {
+                    dp<7>(hand_hash.first, deltas, dists[hand_hash.second]);
                   });
 
     std::for_each(dists.begin(), dists.end(),
                   [&fout](const auto& dist) {
-                    for (int i = 0; i < 10; ++i) {
-                      const uint32_t tmp = dist[i] | (dist[i + 10] << 4) | (dist[i + 20] << 13);
-
-                      fout.write(reinterpret_cast<const char*>(&tmp), sizeof(uint32_t));
-                    }
+                    fout.write(reinterpret_cast<const char*>(dist.data()), dist.size() * sizeof(uint32_t));
                   });
   }
 

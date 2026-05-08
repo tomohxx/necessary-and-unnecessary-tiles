@@ -59,19 +59,14 @@ void dp(const Hand<N>& hand, const std::vector<Delta>& deltas, std::array<uint32
   table[0][0][0][0][0] = {0, 0u, 0u};
 
   for (int n = 0; n < N; ++n) {
-    for (int a = 0; a <= 4; ++a) {
-      for (int b = 0; b <= 4; ++b) {
-        for (int h = 0; h <= 1; ++h) {
-          for (int m = 0; m <= 4; ++m) {
-            auto& tmp = table[n][a][b][h][m];
+    for (const auto& delta : deltas) {
+      for (int a = 0; a <= 4 - delta.a; ++a) {
+        for (int b = 0; b <= std::min(4 - delta.b, a); ++b) {
+          for (int h = 0; h <= 1 - delta.h; ++h) {
+            for (int m = 0; m <= 4 - delta.m; ++m) {
+              const auto& tmp = table[n][a][b][h][m];
 
-            if (tmp.sht == MAX_SHT) continue;
-
-            for (const auto& delta : deltas) {
-              if (a + delta.a > 4 ||
-                  b + delta.b > 4 ||
-                  h + delta.h > 1 ||
-                  m + delta.m > 4) continue;
+              if (tmp.sht == MAX_SHT) continue;
 
               const auto d = a + delta.a - hand[n];
 

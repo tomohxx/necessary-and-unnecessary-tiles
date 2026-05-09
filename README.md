@@ -1,19 +1,19 @@
 # Necessary and Unnecessary Tiles
 
-A tool for calculating necesaary tiles and unnecessary tiles for winning hands in Japanese mahjong.
+A tool for calculating shanten numbers and identifying necessary and unnecessary tiles in mahjong.
 
 [Read this in Japanese (日本語).](README.ja.md)
 
-## What are necessary tiles and unecessary tiles in mahjong?
+## What are necessary tiles and unnecessary tiles in mahjong?
 
 - Necessary tiles:
-  - the tiles needed to win with **least number of exchanges**.
-  - decrease the shanten number when one of them is drawn.
-  - called "yuukouhai" or "ukeire" in Japanese.
+   - tiles needed to win with the **fewest tile exchanges**.
+   - drawing one of them decreases the shanten number.
+   - called "yuukouhai" or "ukeire" in Japanese.
 - Unnecessary tiles:
-  - the tiles unneeded to win with **least number of exchanges**.
-  - keep the shanten number unchanged when one of them is discarded.
-  - called "yojouhai" in Japanese.
+   - tiles not needed to win with the **fewest tile exchanges**.
+   - discarding one of them keeps the shanten number unchanged.
+   - called "yojouhai" in Japanese.
 
 ## Build
 
@@ -35,13 +35,13 @@ $ cmake .. -DCMAKE_BUILD_TYPE=Release
 $ make
 ```
 > [!NOTE]
-> A compiler compatiable with C++20 or higher is needed.
+> A compiler compatible with C++20 or later is required.
 
 ### Compile options
 
 #### `-DENABLE_NYANTEN`
 
-It enables the table search algorithm to use the minimal perfect hash function used in Cryolite's nyanten[^1][^2]. Enabling this option can reduce the size of tables. However, the number of tiles in a hand that can be calculated shanten number is limited to 14 or less.
+This enables the table search algorithm to use the minimal perfect hash function used in Cryolite's nyanten[^1][^2]. Enabling this option can reduce the size of the tables. However, the number of tiles in a hand for which shanten numbers can be calculated is limited to 14 or less.
 
 [^1]: https://github.com/Cryolite/nyanten
 [^2]: https://www.slideshare.net/slideshow/a-fast-and-space-efficient-algorithm-for-calculating-deficient-numbers-a-k-a-shanten-numbers-pptx/269706666
@@ -52,7 +52,7 @@ It fixes the random seed used in the example program.
 
 #### Building tables
 
-Build tables of parameters required for calculating shanten number. Create files `index_dw_h.bin` and `index_dw_s.bin`.
+Build the parameter tables required for calculating necessary and unnecessary tiles. This creates `index_dw_h.bin` and `index_dw_s.bin`.
 
 ```
 $ ./mkind
@@ -64,7 +64,7 @@ $ ./mkind
 ## Usage
 
 1. Prepare a `std::array<int, 34>` array representing a hand.
-   - The `n` th element stores the number of `n` th tiles.
+   - The `n`-th element stores the number of copies of the `n`-th tile.
 
       |         | 1           | 2            | 3           | 4            | 5            | 6            | 7          | 8       | 9       |
       | :------ | :---------- | :----------- | :---------- | :----------- | :----------- | :----------- | :--------- | :------ | :------ |
@@ -73,7 +73,7 @@ $ ./mkind
       | *Souzu* | 18 (1s)     | 19 (2s)      | 20 (3s)     | 21 (4s)      | 22 (5s)      | 23 (6s)      | 24 (7s)    | 25 (8s) | 26 (9s) |
       | *Jihai* | 27 (*East*) | 28 (*South*) | 29 (*West*) | 30 (*North*) | 31 (*White*) | 32 (*Green*) | 33 (*Red*) |         |         |
 
-   - For example, if you have *manzu* tiles (1, 2, 3), *pinzu* tiles (2, 4, 5, 7, 7, 9), and *jihai* tiles (*East*, *West*, *White*, *White*, *White*), define the following array.
+   - For example, if the hand is *123m245779p13555z*, define the array as follows.
 
       ```cpp
       std::array<int, 34> hand = {
@@ -84,7 +84,7 @@ $ ./mkind
       };
       ```
 
-1. Calculate the shanten number, necessary tiles and the unnecessary tiles.
+1. Calculate the shanten number and the necessary and unnecessary tiles.
    ```cpp
    std::tuple<int, unsigned int, uint64_t, uint64_t> CalshtDW::operator()(const std::array<int, 34>& t,
                                                                           int m,
@@ -94,18 +94,18 @@ $ ./mkind
    ```
 
 > [!NOTE]
-> Normally, substitute the value obtained by dividing the number of tiles by 3 into `m`.
+> Normally, set `m` to the number of tiles divided by 3.
 
 > [!NOTE]
-> `mode` specifies for which winning pattern calculate shanten number. When the pattern is "General Form", `mode` is 1, when "Seven Pairs": 2, "Thirteen Orphans": 4. When calculating the Shanten number for multiple winning patterns, specify the logical sum of them.
+> `mode` specifies which winning patterns to calculate shanten numbers for. Use 1 for General Form, 2 for Seven Pairs, and 4 for Thirteen Orphans. When calculating shanten numbers for multiple winning patterns, specify their bitwise OR.
 
 > [!NOTE]
-> This method returns the value of shunten number + 1, mode, necessary tiles, unnecessary tiles. The mode indicates which winning pattern (General Form, Seven Pairs, Thirteen Orphans) has the minimum shunten number. Each valid/unnecessary tile is represented by a 64-bit integer. Whether 1 or 0 of the `i`-th bit indicates whether the `i`-th tile is a necessary tile (or an unnecessary tile) or not.
+> This method returns **the shanten number + 1**, the mode, the necessary tiles, and the unnecessary tiles. The mode indicates which winning pattern (General Form, Seven Pairs, or Thirteen Orphans) gives the minimum shanten number. Necessary and unnecessary tiles are each represented as a 64-bit integer. The `n`-th bit indicates whether the `n`-th tile is a necessary tile or an unnecessary tile.
 
 > [!NOTE]
-> If you set `check_hand` to `true`, the hand will be validated. If you set `three_player` to `true`, it will calculate the number of shanten in three-player mahjong.
+> If you set `check_hand` to `true`, the hand is validated. If you set `three_player` to `true`, the values are calculated for three-player mahjong.
 
-For example, calculate the necessary tiles and unneccessary tiles of the hand defined above. It requires one of *manzu* tiles (1 to 9) or one of *jihai* tiles (*East*, *West*) for winning, however one of *manzu* tiles (2, 4, 5, 7, 9) or one of  *jihai* tiles (*East*, *West*, *White*) is uneeded. The source code is as follows:
+As an example, the following code calculates the necessary and unnecessary tiles for the hand defined above. For this hand, the necessary tiles are the *Pinzu* tiles 1 through 9 and the honor tiles *East* and *West*, while the unnecessary tiles are *East*, *West*, and *White*.
 
 ```cpp
 #include <array>
@@ -146,7 +146,7 @@ Output:
 
 ## Example
 
-This program simultes single player mahjong. In each round, it discards one of unnecessary tiles, and then maximize the number of necessary tiles.
+This program simulates single-player mahjong. In each turn, it discards a tile so that the shanten number remains unchanged and the number of necessary tiles after the discard is maximized.
 
 ```
 $ ./example 1000000 0
@@ -173,8 +173,8 @@ Turn    Shanten Number (-1 - 6) Hora    Tempai  Exp.
 17      174602  505612  282727  35836   1216    7       0       0       0.174602        0.680214        0.183473
 ```
 
-- The first line shows the number of hand tiles, the second line shows the number of games, and the third line shows the execution time (milliseconds).
-- The sixth line onward shows the ratio of each shanten number (-1 to 6), winning ratios, *tempai* ratios, expected values of shanten numbers from left to right.
+- The first line shows the number of hand tiles, and the second line shows the number of rounds.
+- From the fourth line onward, each line shows, from left to right, the turn number, the ratio of each shanten number (-1 to 6), the winning rate, the tempai rate, and the expected shanten number.
 
 ## License
 

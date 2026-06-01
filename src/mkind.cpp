@@ -37,9 +37,7 @@ struct Data {
 void chmin(Data& x, const Data y)
 {
   if (x.sht > y.sht) {
-    x.sht = y.sht;
-    x.disc = y.disc;
-    x.wait = y.wait;
+    x = y;
   }
   else if (x.sht == y.sht) {
     x.disc |= y.disc;

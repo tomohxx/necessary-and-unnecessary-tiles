@@ -152,7 +152,7 @@ This program simulates single-player mahjong. In each turn, it discards a tile s
 $ ./example 1000000 0
 Number of Tiles         13
 Number of Rounds        1000000
-Turn    Shanten Number (-1 - 6) Hora    Tempai  Exp.
+Turn    Shanten Number (-1 - 6) Hora    Tenpai  Exp.
 0       2       693     23529   195244  439517  284432  55027   1556    0.000002        0.000695        3.154765
 1       26      3112    60375   312973  435687  168941  18689   197     0.000026        0.003138        2.763747
 2       141     9568    118865  408529  368585  88330   5955    27      0.000141        0.009709        2.424794
@@ -174,7 +174,7 @@ Turn    Shanten Number (-1 - 6) Hora    Tempai  Exp.
 ```
 
 - The first line shows the number of hand tiles, and the second line shows the number of rounds.
-- From the fourth line onward, each line shows, from left to right, the turn number, the ratio of each shanten number (-1 to 6), the winning rate, the tempai rate, and the expected shanten number.
+- From the fourth line onward, each line shows, from left to right, the turn number, the ratio of each shanten number (-1 to 6), the winning rate, the tenpai rate, and the expected shanten number.
 
 ## License
 

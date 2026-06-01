@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
 
   std::cout << std::format("{:<24s}{:<16d}\n", "Number of Tiles", NUM_TILES);
   std::cout << std::format("{:<24s}{:<16d}\n", "Number of Rounds", NUM_ROUNDS);
-  std::cout << std::format("Turn\tShanten Number (-1 - 6)\tHora\tTempai\tExp.\n");
+  std::cout << std::format("Turn\tShanten Number (-1 - 6)\tHora\tTenpai\tExp.\n");
 
   for (int i = 0; i < NUM_TURNS; ++i) {
     std::cout << i << "\t";

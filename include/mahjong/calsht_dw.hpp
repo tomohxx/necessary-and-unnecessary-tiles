@@ -36,8 +36,12 @@ namespace mahjong {
     std::tuple<int, uint64_t> calc_sp(const std::array<int, 34>& t,
                                       const CalcWait&,
                                       bool three_player = false) const;
-    std::tuple<int, uint64_t> calc_to(const std::array<int, 34>& t, const CalcDisc&) const;
-    std::tuple<int, uint64_t> calc_to(const std::array<int, 34>& t, const CalcWait&) const;
+    std::tuple<int, uint64_t> calc_to(const std::array<int, 34>& t,
+                                      const CalcDisc&,
+                                      bool three_player = false) const;
+    std::tuple<int, uint64_t> calc_to(const std::array<int, 34>& t,
+                                      const CalcWait&,
+                                      bool) const;
 
   public:
     CalshtDW(const std::string& dir);

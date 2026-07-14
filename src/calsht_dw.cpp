@@ -5,7 +5,6 @@
 #include <mahjong/calsht_dw.hpp>
 #include <ranges>
 #include <stdexcept>
-#include <type_traits>
 constexpr int NUM_TIDS = 34;
 const Hash<9> hash1;
 const Hash<7> hash2;
@@ -180,7 +179,9 @@ namespace mahjong {
     return {7 - pair + (kind < 7 ? 7 - kind : 0), wait};
   }
 
-  std::tuple<int, uint64_t> CalshtDW::calc_to(const std::array<int, NUM_TIDS>& t, const CalcDisc&) const
+  std::tuple<int, uint64_t> CalshtDW::calc_to(const std::array<int, NUM_TIDS>& t,
+                                              const CalcDisc&,
+                                              const bool three_player) const
   {
     int pair = 0;
     int kind = 0;
@@ -195,6 +196,7 @@ namespace mahjong {
     }
 
     for (const int i : {1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25}) {
+      if (three_player && i > 0 && i < 8) continue;
       if (t[i] > 0) disc |= 1ul << i;
     }
 
@@ -203,7 +205,9 @@ namespace mahjong {
     return {14 - kind - (pair > 0 ? 1 : 0), disc};
   }
 
-  std::tuple<int, uint64_t> CalshtDW::calc_to(const std::array<int, NUM_TIDS>& t, const CalcWait&) const
+  std::tuple<int, uint64_t> CalshtDW::calc_to(const std::array<int, NUM_TIDS>& t,
+                                              const CalcWait&,
+                                              const bool) const
   {
     int pair = 0;
     int kind = 0;
@@ -290,7 +294,7 @@ namespace mahjong {
     }
 
     if ((mode & 4u) && m == 4) {
-      if (auto [sht, disc_or_wait] = calc_to(t, calc_mode); sht < std::get<0>(ret)) {
+      if (auto [sht, disc_or_wait] = calc_to(t, calc_mode, three_player); sht < std::get<0>(ret)) {
         ret = {sht, 4u, disc_or_wait};
       }
       else if (sht == std::get<0>(ret)) {

@@ -84,11 +84,13 @@ $ ./mkind
 
 1. シャンテン数と有効牌・不要牌を計算します.
    ```cpp
-   std::tuple<int, unsigned int, uint64_t, uint64_t> CalshtDW::operator()(const std::array<int, 34>& t,
-                                                                          int m,
-                                                                          unsigned int mode,
-                                                                          bool check_hand = false,
-                                                                          bool three_player = false) const
+   template <class CalcMode>
+   std::tuple<int, unsigned int, uint64_t> operator()(const std::array<int, 34>& t,
+                                                      int m,
+                                                      unsigned int mode,
+                                                      const CalcMode& calc_mode,
+                                                      bool check_hand = false,
+                                                      bool three_player = false) const
    ```
 
 > [!NOTE]
@@ -98,7 +100,10 @@ $ ./mkind
 > `mode`にはどのあがりパターンに対してシャンテン数を計算するかを指定します. 一般形の場合は1, 七対子の場合は2, 国士無双の場合は4です. 複数のあがりパターンに対してシャンテン数・有効牌・不要牌を計算する場合はそれらの論理和を指定します.
 
 > [!NOTE]
-> このメソッドは**シャンテン数+1**の値, モード, 有効牌, 不要牌を返します. モードはどのあがりパターン(一般形, 七対子, 国士無双)でシャンテン数が最小となるかを表します. 有効牌/不要牌はそれぞれ64bit整数で表されます. `n`番目のビットの1/0が`n`番目の牌が有効牌かどうか(または不要牌かどうか)を表します.
+> `calc_mode`には不要牌を計算する場合は`CalcDisc`, 有効牌を計算する場合は`CalcWait`を指定します.
+
+> [!NOTE]
+> このメソッドは**シャンテン数+1**の値, モード, 有効牌または不要牌を返します. モードはどのあがりパターン(一般形, 七対子, 国士無双)でシャンテン数が最小となるかを表します. 有効牌/不要牌はそれぞれ64bit整数で表されます. `n`番目のビットの1/0が`n`番目の牌が有効牌かどうか(または不要牌かどうか)を表します.
 
 > [!NOTE]
 > `check_hand`を`true`にすると手牌のバリデーションを行います. `three_player`を`true`にすると三人麻雀での各値を計算します.
@@ -124,12 +129,11 @@ int main()
          1, 0, 1, 0, 3, 0, 0        // jihai
    };
 
-   const auto [sht, mode, disc, wait] = calsht(hand, 4, 7);
+   const auto [sht, mode, disc] = calsht(hand, 4, 7, mahjong::CalcDisc());
 
    std::cout << sht << std::endl;
    std::cout << mode << std::endl;
    std::cout << std::bitset<34>(disc) << std::endl;
-   std::cout << std::bitset<34>(wait) << std::endl;
 
    return 0;
 }
@@ -139,7 +143,6 @@ int main()
 3
 1
 0010101000000000101011010000000000
-0000101000000000111111111000000000
 ```
 
 ## 実行例

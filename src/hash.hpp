@@ -1,5 +1,4 @@
-#ifndef HASH_HPP
-#define HASH_HPP
+#pragma once
 
 #include <array>
 #include <numeric>
@@ -69,6 +68,4 @@ using Hash = DefaultHash<Length>;
 #else
 template <int Length>
 using Hash = NyantenHash<Length>;
-#endif
-
 #endif

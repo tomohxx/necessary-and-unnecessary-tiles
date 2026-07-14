@@ -59,11 +59,12 @@ int main(int argc, char* argv[])
       ++hand[wall136[j + NUM_TILES]];
       --wall34[wall136[j + NUM_TILES]];
 
-      const auto [sht, mode, disc, wait] = calsht(hand,
-                                                  NUM_TILES / 3,
-                                                  MODE,
-                                                  false,
-                                                  THREE_PLAYER);
+      const auto [sht, mode, disc] = calsht(hand,
+                                            NUM_TILES / 3,
+                                            MODE,
+                                            mahjong::CalcDisc(),
+                                            false,
+                                            THREE_PLAYER);
 
       ++table[j][sht];
 
@@ -81,16 +82,17 @@ int main(int argc, char* argv[])
         if (disc & (1ull << k)) {
           --hand[k];
 
-          const auto [sht_, mode_, disc_, wait_] = calsht(hand,
-                                                          NUM_TILES / 3,
-                                                          MODE,
-                                                          false,
-                                                          THREE_PLAYER);
+          const auto [sht_, mode_, wait] = calsht(hand,
+                                                  NUM_TILES / 3,
+                                                  MODE,
+                                                  mahjong::CalcWait(),
+                                                  false,
+                                                  THREE_PLAYER);
 
           cnt[k] = 0;
 
           for (int l = 0; l < NUM_TIDS; ++l) {
-            cnt[k] += wait_ & (1ull << l) ? wall34[l] : 0;
+            cnt[k] += wait & (1ull << l) ? wall34[l] : 0;
           }
 
           ++hand[k];

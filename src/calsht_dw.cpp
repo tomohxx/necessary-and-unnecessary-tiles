@@ -9,13 +9,24 @@ constexpr int NUM_TIDS = 34;
 const Hash<9> hash1;
 const Hash<7> hash2;
 
-constexpr std::array<std::array<uint32_t, 30>, 5> index1 = {{
-    {0u, 3u, 14u, 14u, 14u, 2u, 14u, 14u, 14u, 14u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 1u, 0u, 0u, 0u, 1u, 0u, 0u, 0u, 0u},
-    {0u, 2u, 14u, 14u, 14u, 1u, 14u, 14u, 14u, 14u, 1u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 1u, 0u, 0u, 0u, 1u, 0u, 0u, 0u, 0u},
-    {0u, 1u, 14u, 14u, 14u, 0u, 14u, 14u, 14u, 14u, 1u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 1u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u},
-    {0u, 0u, 14u, 14u, 14u, 0u, 14u, 14u, 14u, 14u, 1u, 0u, 0u, 0u, 0u, 1u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u},
-    {0u, 0u, 14u, 14u, 14u, 0u, 14u, 14u, 14u, 14u, 1u, 1u, 0u, 0u, 0u, 1u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u},
-}};
+constexpr std::array<std::array<uint32_t, 30>, 5> index1 = []() {
+  std::array<std::array<uint32_t, 30>, 5> ret{};
+
+  for (int i = 0; i < 5; ++i) {
+    std::fill_n(ret[i].begin(), 10, 14u);
+    ret[i][0] = 0u;
+    ret[i][1] = std::max(3 - i, 0);
+    ret[i][5] = std::max(2 - i, 0);
+    ret[i][10] = i > 0 ? 1u : 0;
+    ret[i][11] = i > 3 ? 1u : 0;
+    ret[i][15] = i > 2 ? 1u : 0;
+    ret[i][20] = 0u;
+    ret[i][21] = i < 3 ? 1u : 0;
+    ret[i][25] = i < 2 ? 1u : 0;
+  }
+
+  return ret;
+}();
 
 void shift(uint64_t& lv, const uint64_t rv, uint64_t& lx, const uint64_t rx)
 {

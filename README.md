@@ -86,11 +86,13 @@ $ ./mkind
 
 1. Calculate the shanten number and the necessary and unnecessary tiles.
    ```cpp
-   std::tuple<int, unsigned int, uint64_t, uint64_t> CalshtDW::operator()(const std::array<int, 34>& t,
-                                                                          int m,
-                                                                          unsigned int mode,
-                                                                          bool check_hand = false,
-                                                                          bool three_player = false) const
+   template <class CalcMode>
+   std::tuple<int, unsigned int, uint64_t> operator()(const std::array<int, 34>& t,
+                                                      int m,
+                                                      unsigned int mode,
+                                                      const CalcMode& calc_mode,
+                                                      bool check_hand = false,
+                                                      bool three_player = false) const
    ```
 
 > [!NOTE]
@@ -100,7 +102,10 @@ $ ./mkind
 > `mode` specifies which winning patterns to calculate shanten numbers for. Use 1 for General Form, 2 for Seven Pairs, and 4 for Thirteen Orphans. When calculating shanten numbers for multiple winning patterns, specify their bitwise OR.
 
 > [!NOTE]
-> This method returns **the shanten number + 1**, the mode, the necessary tiles, and the unnecessary tiles. The mode indicates which winning pattern (General Form, Seven Pairs, or Thirteen Orphans) gives the minimum shanten number. Necessary and unnecessary tiles are each represented as a 64-bit integer. The `n`-th bit indicates whether the `n`-th tile is a necessary tile or an unnecessary tile.
+> Set `calc_mode` to `CalcDisc` when calculating unnecessary tiles, and to `CalcWait` when calculating necessary tiles.
+
+> [!NOTE]
+> This method returns **the shanten number + 1**, the mode, the necessary tiles or the unnecessary tiles. The mode indicates which winning pattern (General Form, Seven Pairs, or Thirteen Orphans) gives the minimum shanten number. Necessary and unnecessary tiles are each represented as a 64-bit integer. The `n`-th bit indicates whether the `n`-th tile is a necessary tile or an unnecessary tile.
 
 > [!NOTE]
 > If you set `check_hand` to `true`, the hand is validated. If you set `three_player` to `true`, the values are calculated for three-player mahjong.
@@ -126,12 +131,11 @@ int main()
          1, 0, 1, 0, 3, 0, 0        // jihai
    };
 
-   const auto [sht, mode, disc, wait] = calsht(hand, 4, 7);
+   const auto [sht, mode, disc] = calsht(hand, 4, 7, mahjong::CalcDisc());
 
    std::cout << sht << std::endl;
    std::cout << mode << std::endl;
    std::cout << std::bitset<34>(disc) << std::endl;
-   std::cout << std::bitset<34>(wait) << std::endl;
 
    return 0;
 }
@@ -141,7 +145,6 @@ Output:
 3
 1
 0010101000000000101011010000000000
-0000101000000000111111111000000000
 ```
 
 ## Example

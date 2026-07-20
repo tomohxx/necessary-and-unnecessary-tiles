@@ -6,6 +6,8 @@
 #include <ranges>
 #include <stdexcept>
 constexpr int NUM_TIDS = 34;
+constexpr std::array<int, 21> SIMPLES = {1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25};
+constexpr std::array<int, 13> NON_SIMPLES = {0, 8, 9, 17, 18, 26, 27, 28, 29, 30, 31, 32, 33};
 constexpr Hash<9> hash1;
 constexpr Hash<7> hash2;
 
@@ -199,14 +201,14 @@ namespace mahjong {
     uint64_t disc = 0ull;  // 不要牌
     uint64_t disc_ = 0ull; // 不要牌候補
 
-    for (const int i : {0, 8, 9, 17, 18, 26, 27, 28, 29, 30, 31, 32, 33}) {
+    for (const int i : NON_SIMPLES) {
       if (t[i] >= 1) ++kind;
       if (t[i] >= 2) ++pair;
       if (t[i] == 2) disc_ |= 1ull << i;
       if (t[i] > 2) disc |= 1ull << i;
     }
 
-    for (const int i : {1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25}) {
+    for (const int i : SIMPLES) {
       if (three_player && i > 0 && i < 8) continue;
       if (t[i] > 0) disc |= 1ul << i;
     }
@@ -225,7 +227,7 @@ namespace mahjong {
     uint64_t wait = 0ul;  // 有効牌
     uint64_t wait_ = 0ul; // 有効牌候補
 
-    for (const int i : {0, 8, 9, 17, 18, 26, 27, 28, 29, 30, 31, 32, 33}) {
+    for (const int i : NON_SIMPLES) {
       if (t[i] >= 1) ++kind;
       if (t[i] >= 2) ++pair;
       if (t[i] == 0) wait |= 1ull << i;

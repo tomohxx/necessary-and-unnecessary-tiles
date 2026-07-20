@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MAHJONG_CALSHT_DW_HPP
+#define MAHJONG_CALSHT_DW_HPP
 
 #include <array>
 #include <cstdint>
@@ -54,3 +55,5 @@ namespace mahjong {
                                                        bool three_player = false) const;
   };
 }
+
+#endif
